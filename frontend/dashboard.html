@@ -526,7 +526,7 @@
             
             reader.onload = function(e) {
                 const text = e.target.result;
-                const lines = text.split('\\n').filter(l => l.trim() !== '');
+                const lines = text.split('\n').filter(l => l.trim() !== '');
                 if (lines.length < 2) return;
                 
                 for(let i = 1; i < lines.length; i++) {
@@ -567,18 +567,18 @@
         }
 
         function parseCsvRow(text) {
-            const re_valid = /^\\s*(?:'[^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*'|"[^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*"|[^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*)\\s*(?:,\\s*(?:'[^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*'|"[^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*"|[^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*)\\s*)*$/;
-            const re_value = /(?!\\s*$)\\s*(?:'([^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*)'|"([^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*)"|([^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*))\\s*(?:,|$)/g;
-            
-            let a = [];
-            text.replace(re_value, function(m0, m1, m2, m3) {
-                if      (m1 !== undefined) a.push(m1.replace(/\\\\'/g, "'"));
-                else if (m2 !== undefined) a.push(m2.replace(/\\\\"/g, '"'));
-                else if (m3 !== undefined) a.push(m3);
-                return '';
-            });
-            if (/,\\s*$/.test(text)) a.push('');
-            return a;
+            let row = [''], inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                if (c === '"') {
+                    inQuotes = !inQuotes;
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            return row.map(cell => cell.trim());
         }
 
         async function fetchExposureData() {
