@@ -1,0 +1,11 @@
+Account Number,Account Name,Asset Type,Ticker/CUSIP,Security Name,Quantity,Price,Market Value,Cost Basis,Unrealized Gain/Loss,Asset Allocation (%)
+GS-7845123,Individual Brokerage,Equity,AAPL,Apple Inc.,50,185.32,9266.00,7500.00,1766.00,12.5
+GS-7845123,Individual Brokerage,Equity,MSFT,Microsoft Corp.,30,402.15,12064.50,9000.00,3064.50,16.3
+GS-7845123,Individual Brokerage,Equity,AMZN,Amazon.com Inc.,20,178.75,3575.00,3000.00,575.00,4.8
+GS-7845123,Individual Brokerage,ETF,VOO,Vanguard S&P 500 ETF,40,480.10,19204.00,15000.00,4204.00,25.9
+GS-7845123,Individual Brokerage,ETF,QQQ,Invesco QQQ Trust,25,445.60,11140.00,9500.00,1640.00,15.0
+GS-7845123,Individual Brokerage,Mutual Fund,GSLCX,Goldman Sachs Large Cap Core Fund,100,32.45,3245.00,3000.00,245.00,4.4
+GS-7845123,Individual Brokerage,Mutual Fund,GSPTX,Goldman Sachs Short Duration Government Fund,200,10.15,2030.00,2000.00,30.00,2.7
+GS-7845123,Individual Brokerage,ETF,IEMG,iShares Core MSCI Emerging Markets ETF,60,52.80,3168.00,2800.00,368.00,4.3
+GS-7845123,Individual Brokerage,Equity,TSLA,Tesla Inc.,15,172.30,2584.50,2000.00,584.50,3.5
+GS-7845123,Individual Brokerage,Cash,CASH,USD Cash Position,1,5000.00,5000.00,5000.00,0.00,6.6
