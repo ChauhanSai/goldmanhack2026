@@ -1,75 +1,398 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html class="light" lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Finance | Welcome</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <nav>
-        <div class="logo">Aura Finance</div>
-    </nav>
-
-    <main style="max-width: 1000px; margin: 0 auto; padding: 4rem 2rem;">
-        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 4rem;">
-            <h1 style="font-size: 3.5rem; color: var(--brand-blue); margin-bottom: 1rem;">Own Your Future.</h1>
-            <p style="font-size: 1.25rem; max-width: 600px; margin-bottom: 2rem;">Aura Finance brings institutional-grade portfolio risk analysis and visual goal planning to everyday investors. No jargon, just clear paths to wealth.</p>
-            
-            <div class="card" style="width: 100%; max-width: 400px; text-align: left;">
-                <h3 style="margin-bottom: 1.5rem; text-align: center;">Access Your Dashboard</h3>
-                <form id="login-form">
-                    <input type="email" placeholder="Email Address (e.g. user@demo.com)" value="user@demo.com" required>
-                    <input type="password" placeholder="Password" value="password" required>
-                    <button type="submit" class="btn" style="width: 100%; margin-bottom: 1rem;">Log In to Aura</button>
-                    <div style="text-align: center; font-size: 0.9rem; color: var(--text-muted);">
-                        Don't have an account? <a href="#" onclick="alert('Sign up flow mocked for demo.')">Sign Up</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
-            <div class="card">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🧭</div>
-                <h3>Goal Canvas</h3>
-                <p style="font-size: 0.9rem;">Visually map your financial milestones and rebalance dynamically with AI assistance.</p>
-            </div>
-            <div class="card">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">👯</div>
-                <h3>Financial Twin</h3>
-                <p style="font-size: 0.9rem;">Simulate your future wealth and see the impact of small portfolio adjustments today.</p>
-            </div>
-            <div class="card">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🍞</div>
-                <h3>Bread Bot</h3>
-                <p style="font-size: 0.9rem;">Get instant sentiment analysis on any stock ticker powered by NLP.</p>
-            </div>
-        </div>
-    </main>
-
-    <script src="/js/app.js"></script>
-    <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerText = 'Authenticating...';
-            
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: 'test@example.com', password: 'password' })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    window.location.href = '/dashboard';
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9ff",
+                        "on-surface": "#191c22",
+                        "primary": "#0052ac",
+                        "primary-container": "#196ad4",
+                        "on-primary-container": "#ecf0ff",
+                        "background": "#f9f9ff",
+                        "on-background": "#191c22",
+                        "surface-container": "#ecedf7",
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "base": "8px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "lg": "48px",
+                        "margin": "32px",
+                        "sm": "12px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Work Sans", "sans-serif"],
+                        "body-md": ["Work Sans", "sans-serif"],
+                        "body-lg": ["Work Sans", "sans-serif"],
+                        "headline-md": ["Epilogue", "sans-serif"],
+                        "headline-lg": ["Epilogue", "sans-serif"],
+                        "headline-xl": ["Epilogue", "sans-serif"],
+                        "label-bold": ["Work Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "label-bold": ["14px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
                 }
-            } catch (e) {
-                window.location.href = '/dashboard';
             }
-        });
+        }
     </script>
+    <style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f9f9ff;
+            color: #191c22;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Epilogue', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .neobrutalist-card {
+            border: 3px solid black;
+            box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+            transition: all 0.1s ease;
+            background-color: white;
+            border-radius: 0px;
+        }
+
+        .neobrutalist-card:active {
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+            transform: translate(8px, 8px);
+        }
+
+        .neobrutalist-btn {
+            border: 4px solid black;
+            box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+            transition: all 0.1s ease;
+            background-color: #196ad4;
+            color: white;
+            font-family: 'Epilogue', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 0px;
+        }
+
+        .neobrutalist-btn:active {
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+            transform: translate(4px, 4px);
+        }
+
+        .sketch-border {
+            border: 3px solid black;
+            position: relative;
+        }
+
+        .sketch-border::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid black;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        .floating-voice {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 100;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            border: 4px solid black;
+            box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+            background: white;
+            border-radius: 0;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+    <title>Moore Money</title>
+</head>
+
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <!-- TopAppBar -->
+    <header
+        class="bg-stone-50 border-b-4 border-black w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+        <div class="text-2xl font-black text-black italic font-['Epilogue'] tracking-tighter uppercase">MOORE MONEY
+        </div>
+        <nav class="hidden md:flex gap-8">
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/dashboard">Portfolio</a>
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/canvas">Goals Canvas</a>
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/twin">Financial Twin</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button class="neobrutalist-btn px-6 py-2">Join Herd</button>
+            <img alt="Mascot Profile" src="./cowIcons/peekingCow.png"
+                class="w-10 h-10 border-2 border-black object-cover" />
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-margin pt-xl pb-lg">
+        <!-- Hero Section -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center mb-xl">
+            <div class="md:col-span-7">
+                <div
+                    class="inline-block bg-primary-container text-white border-2 border-black px-4 py-1 font-label-bold text-label-bold mb-4 rotate-[-1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    NO BULL FINANCIALS
+                </div>
+                <h1 class="font-headline-xl text-headline-xl text-on-background mb-md leading-[1.05]">
+                    FINANCE SO EASY A <span
+                        class="text-primary-container italic underline decoration-8 decoration-black">COW</span> COULD
+                    DO IT.
+                </h1>
+                <p class="font-body-lg text-body-lg max-w-lg mb-lg">
+                    Manage your moo-lah with rebellious tools that cut through the corporate noise. Portfolio mapping,
+                    automated bots, and a cow mascot that actually cares about your savings.
+                </p>
+                <div class="flex flex-wrap gap-md">
+                    <button
+                        class="neobrutalist-btn bg-primary-container text-white px-8 py-4 text-headline-md font-headline-md uppercase">Start
+                        Milking Profits</button>
+                    <button
+                        class="neobrutalist-btn bg-white text-black px-8 py-4 text-headline-md font-headline-md uppercase">View
+                        Ledger</button>
+                </div>
+            </div>
+            <div class="md:col-span-5 relative">
+                <div class="neobrutalist-card bg-white p-4 rotate-2">
+                    <img alt="Main Mascot Hero" src="./cowIcons/defaultCow.png" class="w-full h-auto"
+                        data-alt="A large, central hand-drawn doodle of Moore the Cow standing confidently and waving with one hoof while holding a gold coin in the other. The illustration features thick, intentionally uneven black lines that capture a high-energy, sketchbook feeling. The background is pure white with a few scattered doodle stars and squiggles in #196ad4 blue to add depth and playfulness." />
+                </div>
+                <!-- Sketched Arrow Decor -->
+                <div class="absolute -bottom-10 -left-10 hidden lg:block">
+                    <span class="material-symbols-outlined text-6xl text-black -rotate-45"
+                        style="font-variation-settings: 'FILL' 0, 'wght' 700;">arrow_downward</span>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid Sections -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+            <!-- Portfolio Mapper -->
+            <div class="neobrutalist-card bg-[#e2e2e2] p-md md:col-span-2 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-lg">
+                    <div>
+                        <span class="material-symbols-outlined text-4xl mb-base" data-icon="map">map</span>
+                        <h2 class="font-headline-lg text-headline-lg">Portfolio Mapper</h2>
+                        <p class="font-body-md text-body-md max-w-md">Trace your assets across the global ecosystem. No
+                            hidden corners, just pure visibility.</p>
+                    </div>
+                    <img alt="Mascot peeking" src="./cowIcons/peekingCow.png"
+                        class="w-24 h-24 object-contain translate-x-4 transition-transform group-hover:translate-x-0"
+                        data-alt="A minimalist doodle of a cow mascot peeking playfully from the right side of the frame. The style is neobrutalist with thick black ink lines and high contrast. The cow has a curious expression with large, simple eyes. The white background makes the black strokes pop, creating a modern and artistic financial interface element." />
+                </div>
+                <div class="h-48 bg-white border-2 border-black flex items-center justify-center relative shadow-inner">
+                    <span class="material-symbols-outlined text-6xl opacity-10" data-icon="route">route</span>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-3/4 h-1 bg-black rotate-12 relative">
+                            <div
+                                class="absolute -top-4 left-0 w-8 h-8 bg-primary-container border-2 border-black rounded-none">
+                            </div>
+                            <div class="absolute -bottom-4 right-0 w-8 h-8 bg-white border-2 border-black rounded-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bread Bot -->
+            <div class="neobrutalist-card bg-primary-container text-white p-md">
+                <span class="material-symbols-outlined text-4xl mb-base" data-icon="smart_toy">smart_toy</span>
+                <h2 class="font-headline-lg text-headline-lg mb-sm">Bread Bot</h2>
+                <p class="font-body-md mb-lg">The AI that churns your spare change into butter (and by butter, we mean
+                    compound interest).</p>
+                <div class="bg-black text-white p-4 font-mono text-sm border-2 border-white mb-base">
+                    &gt; STATUS: CHURNING...<br />
+                    &gt; GAINS: +4.2% MOO
+                </div>
+                <button
+                    class="w-full py-2 bg-white text-black font-bold border-2 border-black hover:bg-stone-100">CONFIGURE
+                    BOT</button>
+            </div>
+            <!-- Financial Twin -->
+            <div class="neobrutalist-card bg-white p-md flex flex-col justify-between">
+                <div>
+                    <span class="material-symbols-outlined text-4xl mb-base" data-icon="diversity_3">diversity_3</span>
+                    <h2 class="font-headline-lg text-headline-lg mb-sm">Financial Twin</h2>
+                    <p class="font-body-md">A digital shadow of your spending habits. See the "Future You" based on
+                        today's lattes.</p>
+                </div>
+                <div class="mt-lg border-t-2 border-black pt-md flex items-end gap-2">
+                    <div class="w-full bg-stone-100 h-24 border-2 border-black relative">
+                        <div class="absolute bottom-0 left-0 w-1/3 h-1/2 bg-primary-container border-r-2 border-black">
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-1/3 w-1/3 h-3/4 bg-on-tertiary-container border-r-2 border-black">
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-1/3 h-full bg-black"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Goal Canvas -->
+            <div class="neobrutalist-card bg-on-tertiary-fixed text-black p-md md:col-span-2 relative">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div>
+                        <h2 class="font-headline-lg text-headline-lg mb-sm">Goal Canvas</h2>
+                        <p class="font-body-md mb-md">Paint your future. Define targets, set milestones, and watch the
+                            cow guide you to the finish line.</p>
+                        <ul class="space-y-2">
+                            <li class="flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-primary-container"
+                                    data-icon="check_circle">check_circle</span> New Pasture Fund</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-primary-container"
+                                    data-icon="check_circle">check_circle</span> Golden Hoof Savings</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-primary-container opacity-30"
+                                    data-icon="radio_button_unchecked">radio_button_unchecked</span> Bull Market Exit
+                            </li>
+                        </ul>
+                    </div>
+                    <div
+                        class="border-4 border-dashed border-white/20 rounded-none flex items-center justify-center p-md">
+                        <img alt="Cow with chart" src="./cowIcons/GrowthCow.png" class="max-h-40"
+                            data-alt="A hand-drawn doodle of the cow mascot wearing professional-looking glasses and intently studying a large financial chart that shows an upward trend. The chart is drawn with simple, thick black lines on a white canvas. The overall mood is focused yet whimsical, reinforcing the brand's 'rebellious but reliable' financial philosophy in a high-contrast neobrutalist style." />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Call to Action -->
+        <section class="neobrutalist-card bg-white p-lg text-center mb-xl relative">
+            <div
+                class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-white border-4 border-black rounded-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-4xl text-primary-container"
+                    data-icon="rocket_launch">rocket_launch</span>
+            </div>
+            <h2 class="font-headline-xl text-headline-xl mb-md">READY TO MOO-VE?</h2>
+            <p class="font-body-lg text-body-lg max-w-2xl mx-auto mb-lg">
+                Join 50,000+ others who are tired of boring banking. Get the tools, get the mascot, get the money. No
+                bull, just gains.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-md">
+                <input
+                    class="neobrutalist-card px-6 py-4 font-body-md w-full md:w-80 focus:ring-0 focus:border-primary-container"
+                    placeholder="Enter your email" type="email" />
+                <button class="neobrutalist-btn bg-black text-white px-10 py-4 font-headline-md uppercase">Claim Your
+                    Stake</button>
+            </div>
+        </section>
+    </main>
+    <!-- Floating Voice Assistant Mascot -->
+    <div class="floating-voice group">
+        <div class="relative">
+            <div
+                class="absolute -top-20 right-0 bg-white border-2 border-black p-3 rounded-none shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                <p class="font-label-bold">"Need a hoof, boss?"</p>
+                <div
+                    class="absolute bottom-[-10px] right-6 w-4 h-4 bg-white border-b-2 border-r-2 border-black rotate-45">
+                </div>
+            </div>
+            <div
+                class="w-20 h-20 bg-primary-container border-4 border-black rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform cursor-pointer">
+                <img alt="Voice Mascot" src="./cowIcons/HelpDeskCow.png" class="w-14 h-14 object-contain"
+                    data-alt="A small, circular doodle avatar of the cow mascot's head. The cow is wearing a small headset and has a playful, helpful expression. The style remains consistent with the neobrutalist doodle aesthetic: bold black lines, high contrast, and a charmingly hand-drawn feel. It sits atop a vibrant blue background, acting as a friendly digital assistant." />
+            </div>
+        </div>
+    </div>
+    <footer
+        class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
+        <div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
+        <div class="flex gap-8">
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
+                href="#">Terms</a>
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
+                href="#">Privacy</a>
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle
+                Guide</a>
+        </div>
+        <div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
+    </footer>
+    <!-- BottomNavBar (Mobile) -->
+    <nav
+        class="fixed bottom-0 w-full z-50 flex justify-around items-center h-20 bg-white px-2 pb-safe md:hidden border-t-4 border-black shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)]">
+        <div
+            class="flex flex-col items-center bg-[#196ad4] text-white rounded-none border-2 border-black -translate-y-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-2">
+            <span class="material-symbols-outlined" data-icon="home">home</span>
+            <span class="font-['Epilogue'] text-[10px] font-black uppercase">Home</span>
+        </div>
+        <div class="flex flex-col items-center text-black">
+            <span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+            <span class="font-['Epilogue'] text-[10px] font-black uppercase">Feed</span>
+        </div>
+        <div class="flex flex-col items-center text-black">
+            <span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+            <span class="font-['Epilogue'] text-[10px] font-black uppercase">Wallet</span>
+        </div>
+        <div class="flex flex-col items-center text-black">
+            <span class="material-symbols-outlined" data-icon="person">person</span>
+            <span class="font-['Epilogue'] text-[10px] font-black uppercase">Profile</span>
+        </div>
+    </nav>
 </body>
+
 </html>
