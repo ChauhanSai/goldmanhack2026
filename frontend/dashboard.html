@@ -54,20 +54,15 @@
 
         <div class="dashboard-grid">
             <div class="card">
-                <h3>Asset Allocation</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Asset Allocation</h3>
+                    <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="openManageModal()">+ Manage</button>
+                </div>
                 <div style="height: 250px; margin-bottom: 1.5rem;">
                     <canvas id="allocationChart"></canvas>
                 </div>
-                <ul style="list-style: none;">
-                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
-                        <strong>AAPL</strong> <span style="color: var(--text-muted);">$15,000</span>
-                    </li>
-                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
-                        <strong>TSLA</strong> <span style="color: var(--text-muted);">$8,500</span>
-                    </li>
-                    <li style="padding: 1rem 0; display: flex; justify-content: space-between;">
-                        <strong>VOO</strong> <span style="color: var(--text-muted);">$40,000</span>
-                    </li>
+                <ul id="holdings-list" style="list-style: none;">
+                    <!-- dynamically populated -->
                 </ul>
             </div>
 
@@ -94,31 +89,497 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modals -->
+        <div id="manageModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Manage Portfolio</h2>
+                    <p style="font-size: 0.9rem;">How would you like to update your holdings?</p>
+                </div>
+                <div class="modal-options">
+                    <button class="modal-option-btn" onclick="startPlaidFlow()">
+                        <div class="icon">🏦</div>
+                        <div class="details">
+                            <div class="title">Connect Institution</div>
+                            <div class="desc">Link your broker securely via Plaid.</div>
+                        </div>
+                    </button>
+                    <button class="modal-option-btn" onclick="openCsvModal()">
+                        <div class="icon">📄</div>
+                        <div class="details">
+                            <div class="title">Upload CSV</div>
+                            <div class="desc">Import statements from major brokers.</div>
+                        </div>
+                    </button>
+                    <button class="modal-option-btn" onclick="openManualModal()">
+                        <div class="icon">✍️</div>
+                        <div class="details">
+                            <div class="title">Manual Entry</div>
+                            <div class="desc">Add assets one by one.</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="plaidModal" class="modal-overlay">
+            <div class="modal-content" style="text-align: center; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                <div id="plaid-header" style="display: flex; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--border-color); position: relative; background: #fff;">
+                    <span id="plaid-back" style="cursor: pointer; font-size: 1.25rem; color: var(--text-main); display: none;" onclick="goBackPlaid()">&#8592;</span>
+                    <h2 id="plaid-title" style="flex: 1; margin: 0; font-size: 1.1rem; font-weight: 600;">Select your bank</h2>
+                    <span class="modal-close" style="position: absolute; right: 1.5rem; top: 1.5rem; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);" onclick="closeAllModals()">&times;</span>
+                </div>
+
+                <div style="padding: 1.5rem; text-align: left; max-height: 70vh; overflow-y: auto;">
+                    
+                    <div id="plaid-step-bank">
+                        <input type="text" id="plaid-search" placeholder="Search for your bank" style="width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-size: 1rem; background: #f8fafc;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="modal-option-btn" onclick="selectPlaidBank('Chase')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                <div style="font-weight: 500;">Chase</div>
+                            </div>
+                            <div class="modal-option-btn" onclick="selectPlaidBank('Bank of America')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                <div style="font-weight: 500;">Bank of America</div>
+                            </div>
+                            <div class="modal-option-btn" onclick="selectPlaidBank('Charles Schwab')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">📈</div>
+                                <div style="font-weight: 500;">Charles Schwab</div>
+                            </div>
+                            <div class="modal-option-btn" onclick="selectPlaidBank('Goldman Sachs')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏛️</div>
+                                <div style="font-weight: 500;">Goldman Sachs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="plaid-step-login" style="display: none; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;" id="plaid-login-logo">🏦</div>
+                        <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Log in to <span id="plaid-login-bank"></span></h2>
+                        <div class="form-group" style="text-align: left;">
+                            <input type="text" id="plaid-username" placeholder="User ID" style="margin-bottom: 1rem;">
+                            <div style="position: relative;">
+                                <input type="password" id="plaid-password" placeholder="Password">
+                                <span style="position: absolute; right: 1rem; top: 0.75rem; cursor: pointer; color: var(--brand-blue); font-size: 0.9rem; font-weight: 500;" onclick="togglePlaidPassword()">Show</span>
+                            </div>
+                            <p id="plaid-login-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">Invalid credentials. Please try again.</p>
+                        </div>
+                        <button class="btn" style="width: 100%; margin-top: 1rem; background: #111;" onclick="submitPlaidLogin()">Submit</button>
+                    </div>
+
+                    <div id="plaid-step-mfa" style="display: none; text-align: left;">
+                        <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Please select a method to verify your identity.</p>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background: #f8fafc;">
+                                <input type="radio" name="plaid-mfa" checked>
+                                <span>Text message to ***-***-1234</span>
+                            </label>
+                        </div>
+                        <div id="plaid-mfa-input-section">
+                            <label style="font-weight: 500; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Enter verification code</label>
+                            <input type="text" id="plaid-mfa-code" placeholder="6-digit code" maxlength="6" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <p id="plaid-mfa-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">Invalid code.</p>
+                        </div>
+                        <button class="btn" style="width: 100%; margin-top: 1.5rem; background: #111;" onclick="submitPlaidMfa()">Submit</button>
+                    </div>
+
+                    <div id="plaid-step-accounts" style="display: none; text-align: left;">
+                        <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Choose which accounts to share with Aura Finance.</p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked class="plaid-account-cb">
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Checking</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">••••1234</div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 500;">$5,400.00</div>
+                            </label>
+                            <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked class="plaid-account-cb">
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Individual Brokerage</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">••••6789</div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 500;">$65,444.45</div>
+                            </label>
+                        </div>
+                        <button class="btn" style="width: 100%; background: #111;" onclick="submitPlaidAccounts()">Continue</button>
+                    </div>
+
+                    <div id="plaid-step-consent" style="display: none; text-align: left;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="width: 50px; height: 50px; background: var(--brand-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">AF</div>
+                                <div style="color: var(--text-muted); font-size: 1.5rem;">&#8646;</div>
+                                <div style="font-size: 2rem;" id="plaid-consent-logo">🏦</div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">Aura Finance wants to access your <span id="plaid-consent-bank" style="font-weight:600; color: var(--text-main);"></span> data.</p>
+                        </div>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Data being shared:</p>
+                            <ul style="list-style-type: none; font-size: 0.85rem; color: var(--text-muted);">
+                                <li style="margin-bottom: 0.5rem;">✓ Account and routing numbers</li>
+                                <li style="margin-bottom: 0.5rem;">✓ Account balances</li>
+                                <li style="margin-bottom: 0.5rem;">✓ Historical transactions</li>
+                                <li>✓ Investment holdings</li>
+                            </ul>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem;">Secured by Plaid. You can revoke access anytime.</p>
+                        <button class="btn" style="width: 100%; background: #111;" onclick="submitPlaidConsent()">Allow</button>
+                    </div>
+
+                    <div id="plaid-step-success" style="display: none; text-align: center; padding: 2rem 0;">
+                        <div style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">✅</div>
+                        <h2 style="margin-bottom: 0.5rem;">Account connected</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 2rem;">You're all set.</p>
+                        <button class="btn" style="width: 100%; background: #111;" onclick="finishPlaidSuccess()">Done</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="csvModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Upload CSV</h2>
+                    <p style="font-size: 0.9rem;">Import exported statements.</p>
+                </div>
+                <div class="form-group">
+                    <label>Institution Format</label>
+                    <select id="csv-institution">
+                        <option value="gs">Goldman Sachs</option>
+                        <option value="jpmc">JPMorgan Chase</option>
+                        <option value="schwab">Charles Schwab</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>CSV File</label>
+                    <input type="file" id="csv-file" accept=".csv">
+                </div>
+                <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="processCsv()">Import Data</button>
+            </div>
+        </div>
+
+        <div id="manualModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Add Asset Manually</h2>
+                </div>
+                <div class="form-group">
+                    <label>Ticker Symbol</label>
+                    <input type="text" id="manual-ticker" placeholder="e.g. AAPL">
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="manual-quantity" placeholder="e.g. 50">
+                </div>
+                <div class="form-group">
+                    <label>Price per Share ($)</label>
+                    <input type="number" id="manual-price" placeholder="e.g. 150.00">
+                </div>
+                <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="addManualAsset()">Add to Portfolio</button>
+            </div>
+        </div>
     </main>
 
     <script src="/js/app.js"></script>
     <script>
-        // Initialize Chart.js
-        const ctx = document.getElementById('allocationChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['AAPL', 'TSLA', 'VOO'],
-                datasets: [{
-                    data: [15000, 8500, 40000],
-                    backgroundColor: ['#7399c6', '#3b82f6', '#94a3b8'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
-                },
-                cutout: '70%'
+        let portfolio = [
+            { ticker: 'AAPL', value: 15000 },
+            { ticker: 'TSLA', value: 8500 },
+            { ticker: 'VOO', value: 40000 }
+        ];
+
+        let allocationChart;
+
+        function renderPortfolio() {
+            const list = document.getElementById('holdings-list');
+            list.innerHTML = '';
+            let labels = [];
+            let data = [];
+            let colors = ['#7399c6', '#3b82f6', '#94a3b8', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e'];
+
+            portfolio.forEach((asset, i) => {
+                labels.push(asset.ticker);
+                data.push(asset.value);
+                list.innerHTML += `
+                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <span><strong>${asset.ticker}</strong></span> 
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="color: var(--text-muted);">$${asset.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            <button style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;" onclick="removeAsset('${asset.ticker}')" title="Remove">&times;</button>
+                        </div>
+                    </li>
+                `;
+            });
+
+            if (allocationChart) {
+                allocationChart.data.labels = labels;
+                allocationChart.data.datasets[0].data = data;
+                
+                // Keep reusing colors if dataset grows
+                let bgColors = [];
+                for(let i=0; i<data.length; i++){
+                    bgColors.push(colors[i % colors.length]);
+                }
+                allocationChart.data.datasets[0].backgroundColor = bgColors;
+                allocationChart.update();
+            } else {
+                const ctx = document.getElementById('allocationChart').getContext('2d');
+                allocationChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors.slice(0, Math.min(data.length, colors.length)),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        cutout: '70%'
+                    }
+                });
             }
-        });
+        }
+
+        renderPortfolio();
+
+        function removeAsset(ticker) {
+            portfolio = portfolio.filter(a => a.ticker !== ticker);
+            renderPortfolio();
+        }
+
+        function openManageModal() {
+            closeAllModals();
+            document.getElementById('manageModal').style.display = 'flex';
+        }
+
+        function openCsvModal() {
+            closeAllModals();
+            document.getElementById('csvModal').style.display = 'flex';
+        }
+
+        function openManualModal() {
+            closeAllModals();
+            document.getElementById('manualModal').style.display = 'flex';
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        let plaidSelectedBank = '';
+
+        function startPlaidFlow() {
+            closeAllModals();
+            document.getElementById('plaidModal').style.display = 'flex';
+            showPlaidStep('plaid-step-bank', 'Select your bank', false);
+            document.getElementById('plaid-username').value = '';
+            document.getElementById('plaid-password').value = '';
+            document.getElementById('plaid-login-error').style.display = 'none';
+            document.getElementById('plaid-mfa-code').value = '';
+            document.getElementById('plaid-mfa-error').style.display = 'none';
+        }
+
+        function showPlaidStep(stepId, title, showBack) {
+            ['plaid-step-bank', 'plaid-step-login', 'plaid-step-mfa', 'plaid-step-accounts', 'plaid-step-consent', 'plaid-step-success'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+            document.getElementById(stepId).style.display = 'block';
+            
+            document.getElementById('plaid-title').innerText = title;
+            document.getElementById('plaid-back').style.display = showBack ? 'block' : 'none';
+        }
+
+        function goBackPlaid() {
+            const steps = ['plaid-step-bank', 'plaid-step-login', 'plaid-step-mfa', 'plaid-step-accounts', 'plaid-step-consent'];
+            let visibleIndex = -1;
+            steps.forEach((id, idx) => {
+                if(document.getElementById(id).style.display === 'block') visibleIndex = idx;
+            });
+            
+            if (visibleIndex === 1) showPlaidStep('plaid-step-bank', 'Select your bank', false);
+            else if (visibleIndex === 2) showPlaidStep('plaid-step-login', `Log in to ${plaidSelectedBank}`, true);
+            else if (visibleIndex === 3) showPlaidStep('plaid-step-mfa', 'Verify your identity', true);
+            else if (visibleIndex === 4) showPlaidStep('plaid-step-accounts', 'Select accounts', true);
+        }
+
+        function selectPlaidBank(bank) {
+            plaidSelectedBank = bank;
+            document.getElementById('plaid-login-bank').innerText = bank;
+            document.getElementById('plaid-consent-bank').innerText = bank;
+            showPlaidStep('plaid-step-login', `Log in to ${bank}`, true);
+        }
+
+        function togglePlaidPassword() {
+            const pwd = document.getElementById('plaid-password');
+            if (pwd.type === 'password') pwd.type = 'text';
+            else pwd.type = 'password';
+        }
+
+        function submitPlaidLogin() {
+            const user = document.getElementById('plaid-username').value;
+            const pass = document.getElementById('plaid-password').value;
+            if (!user || !pass) {
+                document.getElementById('plaid-login-error').style.display = 'block';
+                return;
+            }
+            document.getElementById('plaid-login-error').style.display = 'none';
+            showPlaidStep('plaid-step-mfa', 'Verify your identity', true);
+        }
+
+        function submitPlaidMfa() {
+            const code = document.getElementById('plaid-mfa-code').value;
+            if (code.length < 4) {
+                document.getElementById('plaid-mfa-error').style.display = 'block';
+                return;
+            }
+            document.getElementById('plaid-mfa-error').style.display = 'none';
+            showPlaidStep('plaid-step-accounts', 'Select accounts', true);
+        }
+
+        function submitPlaidAccounts() {
+            const cbs = document.querySelectorAll('.plaid-account-cb');
+            let any = false;
+            cbs.forEach(cb => { if(cb.checked) any = true; });
+            if (!any) return;
+            showPlaidStep('plaid-step-consent', 'Review and confirm', true);
+        }
+
+        async function submitPlaidConsent() {
+            showPlaidStep('plaid-step-success', 'Account connected', false);
+            
+            try {
+                const res = await fetch('/assets/plaid-example.json');
+                const data = await res.json();
+                
+                data.holdings.forEach(h => {
+                    const sec = data.securities.find(s => s.security_id === h.security_id);
+                    if (sec && h.institution_value > 0) {
+                        addOrUpdateAsset(sec.ticker_symbol, h.institution_value);
+                    }
+                });
+            } catch(e) {
+                console.error("Error loading Plaid data.", e);
+            }
+        }
+        
+        function finishPlaidSuccess() {
+            renderPortfolio();
+            closeAllModals();
+        }
+
+        function addOrUpdateAsset(ticker, value) {
+            const existing = portfolio.find(a => a.ticker === ticker);
+            if (existing) {
+                existing.value += value;
+            } else {
+                portfolio.push({ ticker, value });
+            }
+        }
+
+        function addManualAsset() {
+            const ticker = document.getElementById('manual-ticker').value.toUpperCase();
+            const qty = parseFloat(document.getElementById('manual-quantity').value);
+            const price = parseFloat(document.getElementById('manual-price').value);
+            
+            if (ticker && qty > 0 && price >= 0) {
+                addOrUpdateAsset(ticker, qty * price);
+                renderPortfolio();
+                closeAllModals();
+                document.getElementById('manual-ticker').value = '';
+                document.getElementById('manual-quantity').value = '';
+                document.getElementById('manual-price').value = '';
+            } else {
+                alert("Please fill in valid data.");
+            }
+        }
+
+        function processCsv() {
+            const fileInput = document.getElementById('csv-file');
+            const format = document.getElementById('csv-institution').value;
+            
+            if (!fileInput.files.length) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\\n').filter(l => l.trim() !== '');
+                if (lines.length < 2) return;
+                
+                for(let i = 1; i < lines.length; i++) {
+                    const row = parseCsvRow(lines[i]);
+                    if (!row || row.length === 0) continue;
+                    
+                    let ticker = '';
+                    let value = 0;
+
+                    try {
+                        if (format === 'gs') {
+                            ticker = row[3];
+                            value = parseFloat(row[7]);
+                        } else if (format === 'jpmc') {
+                            ticker = row[3];
+                            value = parseFloat(row[9]);
+                        } else if (format === 'schwab') {
+                            ticker = row[2];
+                            value = parseFloat(row[7]);
+                        }
+
+                        if (ticker && !isNaN(value) && value > 0 && ticker !== 'CASH') {
+                            addOrUpdateAsset(ticker, value);
+                        } else if (ticker === 'CASH') {
+                            addOrUpdateAsset('CASH', value);
+                        }
+                    } catch (err) {
+                        console.error("Error parsing row", row, err);
+                    }
+                }
+                
+                renderPortfolio();
+                closeAllModals();
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function parseCsvRow(text) {
+            const re_valid = /^\\s*(?:'[^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*'|"[^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*"|[^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*)\\s*(?:,\\s*(?:'[^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*'|"[^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*"|[^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*)\\s*)*$/;
+            const re_value = /(?!\\s*$)\\s*(?:'([^'\\\\]*(?:\\\\[\\s\\S][^'\\\\]*)*)'|"([^"\\\\]*(?:\\\\[\\s\\S][^"\\\\]*)*)"|([^,'""\\s\\\\]*(?:\\s+[^,'""\\s\\\\]+)*))\\s*(?:,|$)/g;
+            
+            let a = [];
+            text.replace(re_value, function(m0, m1, m2, m3) {
+                if      (m1 !== undefined) a.push(m1.replace(/\\\\'/g, "'"));
+                else if (m2 !== undefined) a.push(m2.replace(/\\\\"/g, '"'));
+                else if (m3 !== undefined) a.push(m3);
+                return '';
+            });
+            if (/,\\s*$/.test(text)) a.push('');
+            return a;
+        }
 
         async function fetchExposureData() {
             const content = document.getElementById('exposure-content');
