@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Finance | Welcome</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="logo">Aura Finance</div>
+    </nav>
+
+    <main style="max-width: 1000px; margin: 0 auto; padding: 4rem 2rem;">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 3.5rem; color: var(--brand-blue); margin-bottom: 1rem;">Own Your Future.</h1>
+            <p style="font-size: 1.25rem; max-width: 600px; margin-bottom: 2rem;">Aura Finance brings institutional-grade portfolio risk analysis and visual goal planning to everyday investors. No jargon, just clear paths to wealth.</p>
+            
+            <div class="card" style="width: 100%; max-width: 400px; text-align: left;">
+                <h3 style="margin-bottom: 1.5rem; text-align: center;">Access Your Dashboard</h3>
+                <form id="login-form">
+                    <input type="email" placeholder="Email Address (e.g. user@demo.com)" value="user@demo.com" required>
+                    <input type="password" placeholder="Password" value="password" required>
+                    <button type="submit" class="btn" style="width: 100%; margin-bottom: 1rem;">Log In to Aura</button>
+                    <div style="text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+                        Don't have an account? <a href="#" onclick="alert('Sign up flow mocked for demo.')">Sign Up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
+            <div class="card">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🧭</div>
+                <h3>Goal Canvas</h3>
+                <p style="font-size: 0.9rem;">Visually map your financial milestones and rebalance dynamically with AI assistance.</p>
+            </div>
+            <div class="card">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">👯</div>
+                <h3>Financial Twin</h3>
+                <p style="font-size: 0.9rem;">Simulate your future wealth and see the impact of small portfolio adjustments today.</p>
+            </div>
+            <div class="card">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🍞</div>
+                <h3>Bread Bot</h3>
+                <p style="font-size: 0.9rem;">Get instant sentiment analysis on any stock ticker powered by NLP.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = 'Authenticating...';
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'test@example.com', password: 'password' })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    window.location.href = '/dashboard';
+                }
+            } catch (e) {
+                window.location.href = '/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>

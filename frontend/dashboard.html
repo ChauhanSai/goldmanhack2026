@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Aura Finance</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+        .exposure-section {
+            margin-top: 1.5rem;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .tag {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 0.35rem 0.85rem;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            margin: 0.25rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .tag.risk-high { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .tag.risk-med { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .tag.risk-low { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Aura Finance</div>
+        <div class="links">
+            <a href="/dashboard" class="active">Portfolio</a>
+            <a href="/canvas">Goals Canvas</a>
+            <a href="/twin">Financial Twin</a>
+            <a href="/" style="margin-left: 2rem; color: #ef4444;">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Portfolio Dashboard</h1>
+            <button class="btn" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Asset Allocation</h3>
+                <div style="height: 250px; margin-bottom: 1.5rem;">
+                    <canvas id="allocationChart"></canvas>
+                </div>
+                <ul style="list-style: none;">
+                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                        <strong>AAPL</strong> <span style="color: var(--text-muted);">$15,000</span>
+                    </li>
+                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                        <strong>TSLA</strong> <span style="color: var(--text-muted);">$8,500</span>
+                    </li>
+                    <li style="padding: 1rem 0; display: flex; justify-content: space-between;">
+                        <strong>VOO</strong> <span style="color: var(--text-muted);">$40,000</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card" id="exposure-panel">
+                <h3>Risk & Ecosystem Analysis</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Click 'Scan' to map your portfolio's supply chain dependencies and competitor threats using Aura's risk engine.</p>
+                
+                <div id="exposure-content" style="display: none;">
+                    <div class="exposure-section">
+                        <h4 style="color: var(--brand-blue); display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.25rem;">🔗</span> Supply Chain Dependency
+                        </h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Your AAPL holdings expose you to these primary suppliers. A shock to any of these affects your portfolio.</p>
+                        <div id="suppliers-list"></div>
+                    </div>
+
+                    <div class="exposure-section">
+                        <h4 style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.25rem;">⚔️</span> Competitor Ecosystem Risk
+                        </h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Market share threats to your current tech holdings.</p>
+                        <div id="competitors-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Initialize Chart.js
+        const ctx = document.getElementById('allocationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['AAPL', 'TSLA', 'VOO'],
+                datasets: [{
+                    data: [15000, 8500, 40000],
+                    backgroundColor: ['#7399c6', '#3b82f6', '#94a3b8'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                cutout: '70%'
+            }
+        });
+
+        async function fetchExposureData() {
+            const content = document.getElementById('exposure-content');
+            const suppliersList = document.getElementById('suppliers-list');
+            const competitorsList = document.getElementById('competitors-list');
+            
+            content.style.display = 'block';
+            suppliersList.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const res = await fetch('/api/portfolio');
+                const json = await res.json();
+                const data = json.data.apple;
+                
+                suppliersList.innerHTML = data.suppliers.map(s => `<span class="tag risk-med">${s} (22% linked)</span>`).join('');
+                competitorsList.innerHTML = data.competitors.map(c => `<span class="tag risk-high">${c}</span>`).join('');
+            } catch(e) {
+                suppliersList.innerHTML = '<p>Error fetching data.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
