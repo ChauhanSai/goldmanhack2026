@@ -1,0 +1,11 @@
+Account Number,Account Name,Advisor,Symbol,Security Name,Asset Type,Asset Category,Quantity,Price,Market Value,Average Cost,Cost Basis,Unrealized Gain/Loss,Unrealized Gain/Loss (%),YTD Return (%),Allocation (%)
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,AAPL,Apple Inc.,Equity,US Large Cap,60,185.32,11119.20,150.00,9000.00,2119.20,23.55,18.40,14.2
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,MSFT,Microsoft Corp.,Equity,US Large Cap,35,402.15,14075.25,320.00,11200.00,2875.25,25.67,22.10,18.0
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,JPM,JPMorgan Chase & Co.,Equity,Financials,40,195.80,7832.00,160.00,6400.00,1432.00,22.38,15.20,10.0
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,VTI,Vanguard Total Stock Market ETF,ETF,US Equity,75,260.50,19537.50,220.00,16500.00,3037.50,18.41,16.75,25.0
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,VEA,Vanguard FTSE Developed Markets ETF,ETF,International Equity,80,50.25,4020.00,45.00,3600.00,420.00,11.67,9.10,5.1
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,JEPQ,JPMorgan Equity Premium Income ETF,ETF,Income Strategy,65,54.10,3516.50,50.00,3250.00,266.50,8.20,7.85,4.5
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,JGROX,JPMorgan Growth Advantage Fund,Mutual Fund,US Growth,120,28.40,3408.00,25.00,3000.00,408.00,13.60,12.30,4.4
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,JCBUX,JPMorgan Core Bond Fund,Mutual Fund,Fixed Income,200,11.20,2240.00,10.80,2160.00,80.00,3.70,2.90,2.9
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,IEMG,iShares Core MSCI Emerging Markets ETF,ETF,Emerging Markets,70,52.80,3696.00,48.00,3360.00,336.00,10.00,8.50,4.7
+JPM-99023451,Chase Investment Account,Wealth Advisor Team,CASH,USD Cash Balance,Cash,Cash & Equivalents,1,6000.00,6000.00,6000.00,6000.00,0.00,0.00,1.50,7.7

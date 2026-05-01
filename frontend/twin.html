@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Twin | Aura Finance</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .twin-container {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .twin-card {
+            flex: 1;
+            text-align: center;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        .chart-bar-container {
+            height: 250px;
+            width: 60px;
+            background: #f1f5f9;
+            margin: 2rem auto;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--brand-blue);
+            transition: height 0.3s ease;
+        }
+        .slider-container {
+            margin-top: 3rem;
+            text-align: center;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        input[type=range] {
+            width: 100%;
+            margin: 1rem 0;
+            accent-color: var(--brand-blue);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Aura Finance</div>
+        <div class="links">
+            <a href="/dashboard">Portfolio</a>
+            <a href="/canvas">Goals Canvas</a>
+            <a href="/twin" class="active">Financial Twin</a>
+            <a href="/" style="margin-left: 2rem; color: #ef4444;">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1 style="text-align: center;">Your Financial Twin</h1>
+        <p style="text-align: center; max-width: 600px; margin: 0 auto;">Slide the timeline to see how small rebalancing changes today compound over the years. See the gap between acting now versus staying the course.</p>
+        
+        <div class="twin-container">
+            <div class="card twin-card">
+                <div class="avatar">😐</div>
+                <h3>Current You</h3>
+                <p>Status Quo Portfolio (5% APY)</p>
+                <h2 id="current-val" style="margin-top: 1rem;">$10,000</h2>
+            </div>
+            
+            <div class="card twin-card" style="border: 2px solid var(--brand-blue);">
+                <div class="avatar">😎</div>
+                <h3 style="color: var(--brand-blue);">Rebalanced You</h3>
+                <p>Optimized Aura Path (8% APY)</p>
+                <h2 id="rebalanced-val" style="color: var(--brand-blue); margin-top: 1rem;">$10,000</h2>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <div style="height: 350px;">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <h3>Year: <span id="year-display">2026</span></h3>
+            <input type="range" id="year-slider" min="0" max="30" value="0">
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Projecting up to 30 years in the future.</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        const slider = document.getElementById('year-slider');
+        const yearDisplay = document.getElementById('year-display');
+        const currentVal = document.getElementById('current-val');
+        const rebalancedVal = document.getElementById('rebalanced-val');
+
+        const currentRate = 1.05; // 5%
+        const rebalancedRate = 1.08; // 8%
+        const baseAmount = 10000;
+
+        // Initialize Data
+        const labels = Array.from({length: 31}, (_, i) => 2026 + i);
+        const currentData = labels.map((_, i) => baseAmount * Math.pow(currentRate, i));
+        const rebalancedData = labels.map((_, i) => baseAmount * Math.pow(rebalancedRate, i));
+
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Rebalanced Path',
+                        data: rebalancedData,
+                        borderColor: '#7399c6',
+                        backgroundColor: 'rgba(115, 153, 198, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Current Path',
+                        data: currentData,
+                        borderColor: '#94a3b8',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) { return '$' + value / 1000 + 'k'; }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateTwin() {
+            const years = parseInt(slider.value);
+            yearDisplay.innerText = 2026 + years;
+            
+            const curAmount = currentData[years];
+            const rebAmount = rebalancedData[years];
+            
+            currentVal.innerText = '$' + curAmount.toLocaleString(undefined, {maximumFractionDigits:0});
+            rebalancedVal.innerText = '$' + rebAmount.toLocaleString(undefined, {maximumFractionDigits:0});
+            
+            // Highlight the current year on the chart via vertical line or tooltip (mocked by updating title)
+        }
+
+        slider.addEventListener('input', updateTwin);
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+Account Number,Account Type,Symbol,Security Description,Asset Class,Quantity,Price,Market Value,Cost Basis,Cost/Share,Unrealized Gain/Loss,Day Change ($),Day Change (%)
+SCHW-55219876,Individual Brokerage,AAPL,Apple Inc.,Equity,45,185.32,8339.40,7200.00,160.00,1139.40,52.20,0.63
+SCHW-55219876,Individual Brokerage,MSFT,Microsoft Corp.,Equity,25,402.15,10053.75,8200.00,328.00,1853.75,-35.50,-0.35
+SCHW-55219876,Individual Brokerage,GOOGL,Alphabet Inc. Class A,Equity,18,172.60,3106.80,2900.00,161.11,206.80,18.90,0.61
+SCHW-55219876,Individual Brokerage,SWPPX,Schwab S&P 500 Index Fund,Mutual Fund,120,78.45,9414.00,8000.00,66.67,1414.00,25.80,0.27
+SCHW-55219876,Individual Brokerage,SWTSX,Schwab Total Stock Market Index Fund,Mutual Fund,150,74.10,11115.00,9500.00,63.33,1615.00,31.20,0.28
+SCHW-55219876,Individual Brokerage,SCHD,Schwab U.S. Dividend Equity ETF,ETF,60,78.25,4695.00,4200.00,70.00,495.00,12.60,0.27
+SCHW-55219876,Individual Brokerage,SCHB,Schwab U.S. Broad Market ETF,ETF,80,55.40,4432.00,4000.00,50.00,432.00,10.40,0.24
+SCHW-55219876,Individual Brokerage,SCHF,Schwab International Equity ETF,ETF,70,38.20,2674.00,2500.00,35.71,174.00,-8.40,-0.31
+SCHW-55219876,Individual Brokerage,TSLA,Tesla Inc.,Equity,12,172.30,2067.60,1800.00,150.00,267.60,22.10,1.08
+SCHW-55219876,Individual Brokerage,CASH,Schwab Cash Balance,Cash,1,3500.00,3500.00,3500.00,3500.00,0.00,0.00,0.00
