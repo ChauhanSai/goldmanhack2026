@@ -338,16 +338,18 @@
                         <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk
                         </h3>
                     </div>
-                    <p style="color: #64748b; margin-bottom: 1.5rem;">Identify potential bottlenecks and competitive pressures within your holdings.</p>
-                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.5rem;">
+                    <p style="color: #64748b; margin-bottom: 1.5rem;">Identify potential bottlenecks and competitive
+                        pressures within your holdings.</p>
+                    <div
+                        style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.5rem;">
                         <label for="ecosystem-ticker"
                             style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
                             Ticker
                             <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL"
                                 class="w-20 border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
                         </label>
-                        <button class="neobrutalist-btn px-4 py-2 whitespace-nowrap flex-shrink-0" id="scan-button" type="button"
-                            onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+                        <button class="neobrutalist-btn px-4 py-2 whitespace-nowrap flex-shrink-0" id="scan-button"
+                            type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
                     </div>
 
                     <div id="exposure-error"
@@ -368,7 +370,8 @@
                                 Supply Chain Dependency
                             </h4>
                             <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top
-                                supplier dependencies or input categories that may cause knock-on effects for this business.</p>
+                                supplier dependencies or input categories that may cause knock-on effects for this
+                                business.</p>
                             <div id="suppliers-list"></div>
                         </div>
 
@@ -410,7 +413,7 @@
                         <div class="exposure-section" style="margin-bottom: 2rem;">
                             <h4
                                 style="color: #196ad4; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">
-                                Systemic Risk (FRM)</h4>
+                                Overall Market Crash Risk (FRM)</h4>
                             <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Measures how much your
                                 portfolio is exposed to market-wide shocks.</p>
                             <div id="frm-metrics-content"></div>
@@ -982,13 +985,76 @@
                         <thead style="background: #f8fafc; border-bottom: 2px solid black;">
                             <tr>
                                 <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">Asset</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Individual Stock Risk">Base Risk</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Exposure to Other Stocks">Inward Exposure</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Influence on Other Stocks">Market Influence</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Importance in Market Network">Network Importance</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Bridge Between Market Sectors">Sector Bridge Score</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Connection to Overall Market">Market Connection</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Recommended Safe Weight">Rec. Weight</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Base Risk</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> The baseline risk of the stock itself, independent of its network.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Inward Exposure</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> How much this stock is influenced by shocks to other stocks in the market.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Market Influence</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> How strongly a shock to this stock ripples out to affect others.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Network Importance</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> How deeply connected this stock is to other highly-connected stocks.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Sector Bridge Score</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> The degree to which this stock acts as a bridge spreading risk between different sectors.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Market Connection</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> How quickly a shock in this stock can reach all other stocks in the market.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Rec. Weight</span>
+                                        <div class="absolute bottom-full right-0 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> The suggested portfolio allocation to minimize network risk.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Higher is safer</strong></p>
+                                            <div class="absolute -bottom-2 right-6 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1041,10 +1107,46 @@
                         <thead style="background: #f8fafc; border-bottom: 2px solid black;">
                             <tr>
                                 <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">Asset</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Debt Health Risk">Debt Risk</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Cash Shortage Risk">Cash Shortage Risk</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Volatility Risk">Volatility Risk</th>
-                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Profitability Risk">Profitability Risk</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Debt Risk</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> Risk associated with the company's leverage and ability to cover its debt obligations.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Cash Shortage Risk</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> Risk that the company lacks sufficient short-term liquidity to operate.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Volatility Risk</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> Price instability and uncertainty in the stock's market valuation.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">
+                                    <div class="group relative inline-block cursor-help">
+                                        <span style="border-bottom: 2px dotted #9ca3af;">Profitability Risk</span>
+                                        <div class="absolute bottom-full right-0 mb-2 bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50 w-64 text-sm font-sans font-normal text-black text-left pointer-events-none">
+                                            <p><strong>What it means:</strong> Risk stemming from weak or deteriorating margins and earnings.</p>
+                                            <p style="margin-top: 0.25rem;"><strong>Lower is better</strong></p>
+                                            <div class="absolute -bottom-2 right-6 w-3 h-3 bg-white border-b-2 border-r-2 border-black rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
