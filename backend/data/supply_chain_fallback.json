@@ -1,0 +1,186 @@
+{
+  "AAPL": {
+    "companyName": "Apple Inc.",
+    "suppliers": [
+      {
+        "symbol": "TSM",
+        "name": "TSMC",
+        "relationship": "supplier",
+        "category": "chip manufacturing",
+        "weight": 0.22,
+        "confidence": 0.75,
+        "reason": "Apple relies heavily on advanced semiconductor manufacturing."
+      },
+      {
+        "symbol": "QCOM",
+        "name": "Qualcomm",
+        "relationship": "supplier",
+        "category": "connectivity chips",
+        "weight": 0.15,
+        "confidence": 0.7,
+        "reason": "Qualcomm has supplied modem and connectivity components."
+      },
+      {
+        "symbol": "AVGO",
+        "name": "Broadcom",
+        "relationship": "supplier",
+        "category": "wireless components",
+        "weight": 0.14,
+        "confidence": 0.7,
+        "reason": "Broadcom supplies wireless and connectivity components."
+      }
+    ],
+    "customers": [
+      {
+        "symbol": null,
+        "name": "Consumers",
+        "relationship": "customer",
+        "category": "end market",
+        "weight": 0.45,
+        "confidence": 0.8,
+        "reason": "Apple sells devices and services directly to consumers."
+      },
+      {
+        "symbol": null,
+        "name": "Enterprise customers",
+        "relationship": "customer",
+        "category": "business users",
+        "weight": 0.2,
+        "confidence": 0.65,
+        "reason": "Apple devices are used by businesses and institutions."
+      }
+    ],
+    "competitors": [
+      {
+        "symbol": "MSFT",
+        "name": "Microsoft",
+        "relationship": "competitor",
+        "category": "devices/software ecosystem",
+        "weight": 0.22,
+        "confidence": 0.75,
+        "reason": "Microsoft competes in operating systems, services, and devices."
+      },
+      {
+        "symbol": "GOOGL",
+        "name": "Alphabet",
+        "relationship": "competitor",
+        "category": "mobile ecosystem/services",
+        "weight": 0.18,
+        "confidence": 0.72,
+        "reason": "Google competes through Android, services, and app ecosystems."
+      },
+      {
+        "symbol": "005930.KS",
+        "name": "Samsung",
+        "relationship": "competitor",
+        "category": "consumer electronics",
+        "weight": 0.2,
+        "confidence": 0.75,
+        "reason": "Samsung competes directly in smartphones and electronics."
+      }
+    ],
+    "ecosystem": [
+      {
+        "symbol": "AMAT",
+        "name": "Applied Materials",
+        "relationship": "ecosystem",
+        "category": "semiconductor equipment",
+        "weight": 0.12,
+        "confidence": 0.6,
+        "reason": "Apple's chip supply chain depends on broader semiconductor equipment capacity."
+      },
+      {
+        "symbol": "LRCX",
+        "name": "Lam Research",
+        "relationship": "ecosystem",
+        "category": "semiconductor equipment",
+        "weight": 0.1,
+        "confidence": 0.58,
+        "reason": "Semiconductor production depends on wafer fabrication equipment."
+      }
+    ]
+  },
+  "NVDA": {
+    "companyName": "NVIDIA Corporation",
+    "suppliers": [
+      {
+        "symbol": "TSM",
+        "name": "TSMC",
+        "relationship": "supplier",
+        "category": "chip foundry",
+        "weight": 0.35,
+        "confidence": 0.85,
+        "reason": "NVIDIA relies on advanced foundry manufacturing for GPUs."
+      },
+      {
+        "symbol": "MU",
+        "name": "Micron",
+        "relationship": "supplier",
+        "category": "memory",
+        "weight": 0.1,
+        "confidence": 0.6,
+        "reason": "AI accelerators rely on high-performance memory supply."
+      }
+    ],
+    "customers": [
+      {
+        "symbol": "MSFT",
+        "name": "Microsoft",
+        "relationship": "customer",
+        "category": "cloud AI infrastructure",
+        "weight": 0.22,
+        "confidence": 0.75,
+        "reason": "Microsoft is a major buyer of AI infrastructure."
+      },
+      {
+        "symbol": "AMZN",
+        "name": "Amazon",
+        "relationship": "customer",
+        "category": "cloud AI infrastructure",
+        "weight": 0.2,
+        "confidence": 0.72,
+        "reason": "AWS deploys GPU infrastructure for cloud AI workloads."
+      },
+      {
+        "symbol": "GOOGL",
+        "name": "Alphabet",
+        "relationship": "customer",
+        "category": "cloud and AI infrastructure",
+        "weight": 0.18,
+        "confidence": 0.68,
+        "reason": "Google Cloud and AI workloads use accelerator infrastructure."
+      }
+    ],
+    "competitors": [
+      {
+        "symbol": "AMD",
+        "name": "AMD",
+        "relationship": "competitor",
+        "category": "GPUs/AI accelerators",
+        "weight": 0.28,
+        "confidence": 0.82,
+        "reason": "AMD competes in GPUs and AI accelerators."
+      },
+      {
+        "symbol": "INTC",
+        "name": "Intel",
+        "relationship": "competitor",
+        "category": "accelerated computing",
+        "weight": 0.14,
+        "confidence": 0.65,
+        "reason": "Intel competes in chips, accelerators, and data center compute."
+      }
+    ],
+    "ecosystem": [
+      {
+        "symbol": "SMCI",
+        "name": "Super Micro Computer",
+        "relationship": "ecosystem",
+        "category": "AI servers",
+        "weight": 0.13,
+        "confidence": 0.65,
+        "reason": "AI GPU demand affects server integrators."
+      }
+    ]
+  }
+}
