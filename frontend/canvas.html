@@ -314,9 +314,21 @@
         </div>
 
         <div class="prompt-bar">
-            <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
-            <button class="neobrutalist-btn px-4 py-2" onclick="generateNodesFromPrompt()">
+            <div class="group" style="flex: 1; display: flex; position: relative;">
+                <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
+                <div id="disabled-prompt-tooltip"
+                    class="absolute -top-16 left-4 bg-white border-2 border-black p-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none" style="display: none;">
+                    <p class="font-label-bold text-sm">"Clear the canvas to set a new goal, boss!"</p>
+                    <div
+                        class="absolute bottom-[-10px] left-6 w-4 h-4 bg-white border-b-2 border-r-2 border-black rotate-45">
+                    </div>
+                </div>
+            </div>
+            <button class="neobrutalist-btn px-4 py-2" id="generate-btn" onclick="generateNodesFromPrompt()">
                 Generate Path
+            </button>
+            <button class="neobrutalist-btn px-4 py-2" id="clear-btn" style="display: none; background-color: #ef4444;" onclick="clearCanvas()">
+                Clear Canvas
             </button>
         </div>
 
@@ -337,6 +349,16 @@
                 <div class="spinner"></div>
                 <p style="font-family:'Epilogue',sans-serif;font-weight:800;font-size:1rem;">Generating your path...</p>
             </div>
+
+            <!-- Node Edit Prompt Box (will be moved into viewport via JS) -->
+            <div id="node-edit-box" class="absolute hidden z-[200] bg-white border-4 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-64" style="border-radius: 0;">
+                <p class="font-['Epilogue'] font-black uppercase text-[10px] mb-2 text-[#196ad4]">Refine this step</p>
+                <textarea id="node-edit-prompt" class="w-full p-2 border-2 border-black font-['Work_Sans'] text-sm mb-3 focus:outline-none focus:ring-0" rows="2" placeholder="e.g. 'Add more risk'"></textarea>
+                <div class="flex gap-2">
+                    <button id="rebalance-btn" class="flex-1 bg-[#196ad4] text-white border-2 border-black py-1 font-['Epilogue'] font-black uppercase text-[10px] hover:translate-x-0.5 hover:translate-y-0.5 transition-transform">Rebalance</button>
+                    <button id="cancel-edit-btn" class="bg-white text-black border-2 border-black px-2 font-['Epilogue'] font-black uppercase text-[10px]">X</button>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -346,7 +368,9 @@
         const svgLayer = document.getElementById('svg-layer');
         const emptyEl = document.getElementById('canvas-empty');
         const loadingEl = document.getElementById('canvas-loading');
-        const generateBtn = document.querySelector('.neobrutalist-btn[onclick="generateNodesFromPrompt()"]');
+        const aiPromptInput = document.getElementById('ai-prompt');
+        const generateBtn = document.getElementById('generate-btn');
+        const clearBtn = document.getElementById('clear-btn');
 
         // Viewport element to contain everything we want to transform
         let viewportEl;
@@ -369,6 +393,12 @@
         let isPanning = false;
         let lastMouseX, lastMouseY;
 
+        const nodeEditBox = document.getElementById('node-edit-box');
+        const nodeEditPrompt = document.getElementById('node-edit-prompt');
+        const rebalanceBtn = document.getElementById('rebalance-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        let editingNodeId = null;
+
         // Initialize Viewport
         function initViewport() {
             viewportEl = document.createElement('div');
@@ -383,6 +413,9 @@
             // Move SVG into viewport
             canvasEl.insertBefore(viewportEl, svgLayer);
             viewportEl.appendChild(svgLayer);
+            
+            // Move Edit Box into viewport so it transforms with nodes
+            viewportEl.appendChild(nodeEditBox);
             
             updateViewportTransform();
         }
@@ -472,15 +505,26 @@
                 div.style.left = node.x + 'px';
                 div.style.top = node.y + 'px';
 
+                let startNodeX = 0;
+                let startNodeY = 0;
+
                 div.addEventListener('mousedown', e => {
                     e.stopPropagation(); // Prevent background pan
                     e.preventDefault();
                     isDraggingNode = true;
+                    startNodeX = node.x;
+                    startNodeY = node.y;
                     dragNode = { data: node, el: div };
                     // We need to account for scale when calculating the offset
                     dragOffX = (e.clientX / scale) - node.x;
                     dragOffY = (e.clientY / scale) - node.y;
                     div.classList.add('dragging');
+                });
+
+                div.addEventListener('click', e => {
+                    // Only show edit box if we didn't drag the node
+                    if (Math.abs(node.x - startNodeX) > 5 || Math.abs(node.y - startNodeY) > 5) return; 
+                    showNodeEditBox(node.id, node.x, node.y, div.offsetWidth, div.offsetHeight);
                 });
 
                 viewportEl.appendChild(div);
@@ -569,12 +613,15 @@
 
         // ── API call ──────────────────────────────────────────────────────────
         async function generateNodesFromPrompt() {
-            const promptStr = document.getElementById('ai-prompt').value.trim();
+            const promptStr = aiPromptInput.value.trim();
             if (!promptStr) return;
 
             loadingEl.style.display = 'flex';
             emptyEl.style.display = 'none';
             if (generateBtn) generateBtn.disabled = true;
+            aiPromptInput.disabled = true;
+            const tooltip = document.getElementById('disabled-prompt-tooltip');
+            if (tooltip) tooltip.style.display = 'block';
 
             try {
                 const res = await fetch('/api/canvas/prompt', {
@@ -606,12 +653,76 @@
                 ];
             } finally {
                 loadingEl.style.display = 'none';
-                if (generateBtn) generateBtn.disabled = false;
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.style.display = 'none';
+                }
+                if (clearBtn) clearBtn.style.display = 'block';
                 renderCanvas();
             }
         }
 
-        document.getElementById('ai-prompt').addEventListener('keydown', e => {
+        function clearCanvas() {
+            nodesData = [];
+            edgesData = [];
+            aiPromptInput.disabled = false;
+            const tooltip = document.getElementById('disabled-prompt-tooltip');
+            if (tooltip) tooltip.style.display = 'none';
+            if (generateBtn) generateBtn.style.display = 'block';
+            if (clearBtn) clearBtn.style.display = 'none';
+            renderCanvas();
+        }
+
+        function showNodeEditBox(id, x, y, w, h) {
+            editingNodeId = id;
+            nodeEditBox.style.display = 'block';
+            
+            const boxW = 256; 
+            const boxH = 120; 
+            
+            nodeEditBox.style.left = (x + w/2 - boxW/2) + 'px';
+            nodeEditBox.style.top = (y + h/2 - boxH/2) + 'px';
+            
+            nodeEditPrompt.value = '';
+            nodeEditPrompt.focus();
+        }
+
+        cancelEditBtn.addEventListener('click', () => {
+            nodeEditBox.style.display = 'none';
+        });
+
+        rebalanceBtn.addEventListener('click', async () => {
+            const refinement = nodeEditPrompt.value.trim();
+            if (!refinement) return;
+            
+            nodeEditBox.style.display = 'none';
+            loadingEl.style.display = 'flex';
+            
+            try {
+                const res = await fetch('/api/canvas/rebalance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nodes: nodesData,
+                        edges: edgesData,
+                        nodeId: editingNodeId,
+                        refinement: refinement
+                    })
+                });
+                
+                if (!res.ok) throw new Error('Rebalance failed');
+                const data = await res.json();
+                nodesData = data.nodes || [];
+                edgesData = data.edges || [];
+                renderCanvas();
+            } catch (err) {
+                console.error(err);
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        });
+
+        aiPromptInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') generateNodesFromPrompt();
         });
     </script>
