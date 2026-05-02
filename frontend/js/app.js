@@ -12,7 +12,7 @@ function initBreadBot() {
                     
                     <div id="bread-bot-modal" class="hidden mb-4 w-96 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex-col" style="border-radius: 0;">
                         <div class="bg-[#196ad4] text-white p-4 border-b-4 border-black flex justify-between items-center">
-                            <span class="font-['Epilogue'] font-black uppercase">Bread Bot</span>
+                            <span class="font-['Epilogue'] font-black uppercase">Cash Cow</span>
                             <button id="bot-close" class="text-white hover:text-black font-bold text-2xl leading-none">&times;</button>
                         </div>
                         <div class="p-4 text-black">
