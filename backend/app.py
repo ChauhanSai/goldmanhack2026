@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from routes.ecosystem_risk import ecosystem_risk_bp
+from routes.what_if import what_if_bp
 import os
 import json
 import praw
@@ -44,6 +45,7 @@ app = Flask(__name__,
             static_folder='../frontend', 
             static_url_path='')
 app.register_blueprint(ecosystem_risk_bp)
+app.register_blueprint(what_if_bp)
 
 @app.route('/')
 def index():
