@@ -719,7 +719,7 @@
             if (allocationChart) {
                 allocationChart.data.labels = labels;
                 allocationChart.data.datasets[0].data = data;
-                allocationChart.data.datasets[0].backgroundColor = NEO_COLORS.slice(0, data.length);
+                allocationChart.data.datasets[0].backgroundColor = data.map((_, idx) => NEO_COLORS[idx % NEO_COLORS.length]);
                 allocationChart.update();
             } else {
                 const ctx = document.getElementById('allocationChart').getContext('2d');
@@ -729,7 +729,7 @@
                         labels: labels,
                         datasets: [{
                             data: data,
-                            backgroundColor: NEO_COLORS.slice(0, data.length),
+                            backgroundColor: data.map((_, idx) => NEO_COLORS[idx % NEO_COLORS.length]),
                             borderColor: '#000',
                             borderWidth: 3
                         }]
@@ -809,7 +809,8 @@
             
             const datasets = tickers.map((ticker, i) => {
                 const trend = trendsData[ticker];
-                const color = NEO_COLORS[i % NEO_COLORS.length];
+                const portfolioIndex = portfolio.findIndex(p => p.ticker === ticker);
+                const color = NEO_COLORS[portfolioIndex >= 0 ? portfolioIndex % NEO_COLORS.length : i % NEO_COLORS.length];
                 const portfolioItem = portfolio.find(p => p.ticker === ticker);
                 const currentValue = portfolioItem ? portfolioItem.value : 0;
                 

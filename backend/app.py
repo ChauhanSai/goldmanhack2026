@@ -305,7 +305,7 @@ def portfolio_trends():
             stock = yf.Ticker(ticker)
             hist = stock.history(period="1mo")
             if hist.empty:
-                continue
+                raise ValueError("No data found")
             
             prices = hist['Close'].tolist()
             dates = [d.strftime('%Y-%m-%d') for d in hist.index]
@@ -328,6 +328,20 @@ def portfolio_trends():
             needs_save = True
         except Exception as e:
             print(f"Error fetching data for {ticker}: {e}")
+            # Fallback for unlisted assets like CASH
+            dates = [(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(20, -1, -1)]
+            prices = [1.0 for _ in dates]
+            ticker_data = {
+                "date": today,
+                "prices": prices,
+                "dates": dates,
+                "trend": "up",
+                "start_price": 1.0,
+                "end_price": 1.0
+            }
+            cache_data[ticker] = ticker_data
+            results[ticker] = ticker_data
+            needs_save = True
             
     if needs_save:
         try:
