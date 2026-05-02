@@ -340,14 +340,14 @@
                     </div>
                     <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3
                         supplier dependencies and top 3 competitor exposures.</p>
-                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.5rem;">
                         <label for="ecosystem-ticker"
-                            style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                            style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
                             Ticker
                             <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL"
-                                class="w-29 border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
+                                class="w-20 border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
                         </label>
-                        <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button"
+                        <button class="neobrutalist-btn px-4 py-2 whitespace-nowrap flex-shrink-0" id="scan-button" type="button"
                             onclick="fetchExposureData()">Scan for Hidden Exposure</button>
                     </div>
 
