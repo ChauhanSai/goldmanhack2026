@@ -103,6 +103,50 @@ def canvas_prompt():
         "edges": edges
     })
 
+@app.route('/api/canvas/rebalance', methods=['POST'])
+def canvas_rebalance():
+    data = request.json
+    current_nodes = data.get('nodes', [])
+    current_edges = data.get('edges', [])
+    modified_node_id = data.get('nodeId', '')
+    refinement_prompt = data.get('refinement', '')
+    
+    prompt = f"""
+    You are a financial goal assistant. We have a directed graph of nodes and edges representing a financial journey.
+    Current Nodes (with their current x,y coordinates): {json.dumps(current_nodes)}
+    Current Edges: {json.dumps(current_edges)}
+    
+    The user wants to refine the node with id '{modified_node_id}' with the following instruction: '{refinement_prompt}'.
+    
+    Please REGENERATE the entire graph (nodes and edges) based on this change. 
+    Maintain the 'start' and 'finish' nodes if they exist. 
+    CRITICAL: Keep the exact same x, y coordinates for existing nodes that are not affected by the change. Only generate new coordinates (x between 100 and 800, y between 50 and 600) for NEWLY added nodes, or if the rebalance specifically requires shifting adjacent nodes. The current visual look of the canvas should remain largely unchanged.
+    Generate a maximum of 10 nodes.
+    """
+    
+    try:
+        response = gemini_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config={
+                'response_mime_type': 'application/json',
+                'response_schema': GraphResponse,
+                'temperature': 0.7,
+            },
+        )
+        graph_dict = json.loads(response.text)
+        nodes = graph_dict.get('nodes', [])
+        edges = graph_dict.get('edges', [])
+    except Exception as e:
+        print(f"Error rebalancing: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+        
+    return jsonify({
+        "status": "success",
+        "nodes": nodes,
+        "edges": edges
+    })
+
 def analyze_reddit_sentiment(ticker):
     subreddits = ['wallstreetbets', 'stocks', 'investing', 'stockmarket', 'options']
     
