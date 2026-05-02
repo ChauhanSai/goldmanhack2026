@@ -338,31 +338,23 @@
                     <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
                         <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
                             Ticker
-                            <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
+                            <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="w-29 border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
                         </label>
                         <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
                     </div>
                     
                     <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
-                    <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
 
-                    <div id="exposure-content">
-                        <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                                <div>
-                                    <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
-                                    <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
-                                </div>
-                                <div>
-                                    <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
-                                </div>
-                            </div>
-                            <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
-                        </div>
+                    <div id="exposure-loading" style="display: none;" class="p-4 border-2 border-black font-['Work_Sans'] bg-stone-100 rounded-none mb-4">
+                        <p class="font-bold" style="margin: 0;">Scanning...</p>
+                    </div>
+
+                    <div id="exposure-content" style="display: none;">
+
 
                         <div class="exposure-section" style="margin-bottom: 2rem;">
                             <h4
-                                style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">
                                 Supply Chain Dependency
                             </h4>
                             <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
@@ -371,7 +363,7 @@
 
                         <div class="exposure-section" style="margin-bottom: 1rem;">
                             <h4
-                                style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">
                                 Competitor Ecosystem Risk
                             </h4>
                             <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
@@ -992,9 +984,11 @@
                     </div>
                 </div>
                 <div class="text-sm bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <p style="margin-bottom: 0.5rem;"><strong>Statistical Gap:</strong> ${t.mmd_statistic.toFixed(4)}</p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Confidence P-Value:</strong> ${t.p_value.toFixed(4)}</p>
-                    <p><strong>Conclusion:</strong> ${conc}</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Conclusion:</strong> ${conc}</p>
+                    <div style="display: flex;">
+                        <div style="flex: 1;"><strong>Statistical Gap:</strong> ${t.mmd_statistic.toFixed(4)}</div>
+                        <div style="flex: 1;"><strong>Confidence P-Value:</strong> ${t.p_value.toFixed(4)}</div>
+                    </div>
                 </div>
             `;
             document.getElementById('div-metrics-content').innerHTML = divHtml;
@@ -1326,20 +1320,15 @@
             const tickerInput = document.getElementById('ecosystem-ticker');
             const scanButton = document.getElementById('scan-button');
             const errorBanner = document.getElementById('exposure-error');
-            const warningBanner = document.getElementById('exposure-warning');
             const suppliersList = document.getElementById('suppliers-list');
             const competitorsList = document.getElementById('competitors-list');
-            const summaryTicker = document.getElementById('summary-ticker');
-            const summaryExplanation = document.getElementById('summary-explanation');
-            const sourceBadge = document.getElementById('source-badge');
-            const metaCopy = document.getElementById('meta-copy');
+
+            const loadingBanner = document.getElementById('exposure-loading');
             const normalizedTicker = tickerInput.value.trim().toUpperCase();
             const isValidTicker = /^[A-Z0-9.-]{1,12}$/.test(normalizedTicker);
 
             tickerInput.value = normalizedTicker;
             errorBanner.style.display = 'none';
-            warningBanner.style.display = 'none';
-            warningBanner.innerHTML = '';
 
             if (!normalizedTicker) {
                 errorBanner.textContent = 'Enter a ticker before scanning.';
@@ -1359,12 +1348,10 @@
 
             suppliersList.innerHTML = '<p class="font-bold text-stone-500">Loading supply-chain relationships...</p>';
             competitorsList.innerHTML = '<p class="font-bold text-stone-500">Loading peer companies...</p>';
-            summaryTicker.textContent = normalizedTicker || 'Ticker';
-            summaryExplanation.textContent = 'Building an AI-estimated relationship map...';
-            sourceBadge.textContent = 'Loading';
-            metaCopy.textContent = 'This scan is directional. It is not verified supplier data.';
-            scanButton.disabled = true;
-            scanButton.textContent = 'Scanning...';
+
+
+            loadingBanner.style.display = 'block';
+            document.getElementById('exposure-content').style.display = 'none';
 
             try {
                 const res = await fetch(`/api/supply-chain/${encodeURIComponent(normalizedTicker)}`);
@@ -1377,14 +1364,7 @@
                 const topSuppliers = (payload.suppliers || []).slice(0, 3);
                 const topCompetitors = (payload.competitors || []).slice(0, 3);
 
-                summaryTicker.textContent = payload.companyName || payload.symbol || normalizedTicker;
-                summaryExplanation.textContent = payload.source === 'gemini_ai_estimate'
-                    ? 'AI-estimated supplier and competitor map based on public company knowledge.'
-                    : 'Fallback estimate shown because live AI output was unavailable.';
-                sourceBadge.textContent = sourceLabel(payload.source);
-                metaCopy.textContent = payload.source === 'empty'
-                    ? 'No directional map is available for this ticker yet.'
-                    : 'This scan is directional. It is not verified supplier data.';
+
 
                 renderRelationshipItems(
                     suppliersList,
@@ -1397,28 +1377,15 @@
                     'No peer companies found for this ticker yet.'
                 );
 
-                const warnings = [];
-                if (payload.source === 'gemini_ai_estimate') {
-                    warnings.push('This map is AI-estimated and should be treated as directional, not verified supplier data.');
-                }
-                (payload.warnings || []).forEach(item => warnings.push(item));
-                if (warnings.length) {
-                    warningBanner.innerHTML = [...new Set(warnings)]
-                        .map(item => `<div>${escapeHtml(item)}</div>`)
-                        .join('');
-                    warningBanner.style.display = 'block';
-                }
             } catch (error) {
                 suppliersList.innerHTML = '<p class="font-bold text-stone-500">No supply-chain relationships found for this ticker yet.</p>';
                 competitorsList.innerHTML = '<p class="font-bold text-stone-500">No peer companies found for this ticker yet.</p>';
-                summaryExplanation.textContent = 'We could not load the relationship map for that ticker.';
-                sourceBadge.textContent = 'No data';
-                metaCopy.textContent = 'Try another ticker or check your Gemini API configuration.';
+
                 errorBanner.textContent = error.message;
                 errorBanner.style.display = 'block';
             } finally {
-                scanButton.disabled = false;
-                scanButton.textContent = 'Scan for Hidden Exposure';
+                loadingBanner.style.display = 'none';
+                document.getElementById('exposure-content').style.display = 'block';
             }
         }
 
@@ -1433,14 +1400,6 @@
     <footer
         class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
         <div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
-        <div class="flex gap-8">
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
-                href="#">Terms</a>
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
-                href="#">Privacy</a>
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle
-                Guide</a>
-        </div>
         <div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
     </footer>
 </body>
