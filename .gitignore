@@ -3,6 +3,7 @@
 
 # Environment variables
 *.env
+*.env.local
 
 # JetBrains
 .idea/
@@ -12,6 +13,9 @@
 
 # Backend
 /venv
+backend/venv/
+backend/node_modules/
+__pycache__/
 
 # Frontend
-
+.vite/

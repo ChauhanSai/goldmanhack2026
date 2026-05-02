@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from routes.ecosystem_risk import ecosystem_risk_bp
 import os
 import json
 import praw
@@ -39,6 +40,7 @@ app = Flask(__name__,
             template_folder='../frontend', 
             static_folder='../frontend', 
             static_url_path='')
+app.register_blueprint(ecosystem_risk_bp)
 
 @app.route('/')
 def index():
@@ -62,20 +64,6 @@ def login():
     return jsonify({
         "status": "success",
         "user": "Guest User"
-    })
-
-@app.route('/api/portfolio')
-def get_portfolio():
-    # Mock data for supply chain / competitors exposure
-    return jsonify({
-        "status": "success",
-        "data": {
-            "apple": {
-                "suppliers": ["TSMC", "Foxconn", "Qualcomm", "Broadcom", "Sony"],
-                "competitors": ["Samsung", "Microsoft", "Google"],
-                "ecosystem": ["App Economy", "Semiconductors", "Consumer Electronics"]
-            }
-        }
     })
 
 @app.route('/api/canvas/prompt', methods=['POST'])
