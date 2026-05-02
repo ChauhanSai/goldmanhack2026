@@ -169,6 +169,113 @@
             font-size: 1.5rem;
             cursor: pointer;
         }
+
+        .scenario-btn.selected {
+            background-color: #facc15;
+            color: black;
+        }
+
+        .slider-container {
+            margin-top: 2.75rem;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%);
+            border: 3px solid black;
+            box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        .slider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.9rem;
+        }
+
+        .slider-kicker {
+            font-family: 'Epilogue', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #196ad4;
+            margin-bottom: 0.2rem;
+        }
+
+        .slider-header h3 {
+            font-family: 'Epilogue', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 900;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .slider-year-pill {
+            border: 3px solid black;
+            box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+            background: #196ad4;
+            color: white;
+            font-family: 'Epilogue', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.55rem 0.8rem;
+        }
+
+        #year-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 18px;
+            border: 3px solid black;
+            box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+            background: linear-gradient(
+                to right,
+                #196ad4 0%,
+                #196ad4 var(--slider-progress, 0%),
+                #d8e1f3 var(--slider-progress, 0%),
+                #d8e1f3 100%
+            );
+            cursor: pointer;
+        }
+
+        #year-slider::-webkit-slider-runnable-track {
+            height: 100%;
+            background: transparent;
+        }
+
+        #year-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            margin-top: -6px;
+            border: 3px solid black;
+            background: #facc15;
+            box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        #year-slider::-moz-range-track {
+            height: 18px;
+            border: 0;
+            background: transparent;
+        }
+
+        #year-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border: 3px solid black;
+            background: #facc15;
+            box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+            border-radius: 0;
+        }
+
+        .slider-caption {
+            font-size: 0.95rem;
+            color: #5f6470;
+            margin-top: 0.9rem;
+        }
     </style>
     <title>Moore Money</title>
 </head>
@@ -200,11 +307,88 @@
                 course.</p>
         </div>
 
+        <div class="neobrutalist-card p-6" style="margin-top: 2rem;">
+            <div class="flex items-center gap-4 mb-4">
+                <img src="./cowIcons/defaultCow.png" class="w-16 h-16 object-contain" />
+                <div>
+                    <h2 class="text-headline-md font-headline-md">What-If Coach</h2>
+                    <p class="text-body-md">
+                        Pick a scenario or type your own. The coach will suggest a simple rebalance and Moore Money will update your future path.
+                    </p>
+                </div>
+            </div>
+
+            <div id="scenario-buttons" class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4">
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="market_drop" onclick="selectScenario('market_drop')">Market drops 20%</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="inflation" onclick="selectScenario('inflation')">Inflation stays high</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="withdrawal" onclick="selectScenario('withdrawal')">Withdraw 20%</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="tech_crash" onclick="selectScenario('tech_crash')">Tech stocks crash</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="lower_risk" onclick="selectScenario('lower_risk')">Lower my risk</button>
+            </div>
+
+            <div class="mt-6 sketch-border p-4 bg-white">
+                <label class="text-label-bold uppercase block mb-2">
+                    Or ask your own what-if:
+                </label>
+
+                <div class="flex flex-col md:flex-row gap-3">
+                    <input
+                        id="custom-scenario-input"
+                        type="text"
+                        class="flex-1 border-4 border-black px-4 py-3 font-['Work Sans'] text-body-md"
+                        placeholder="Example: What if I need to withdraw $3,000 next year?"
+                        onkeydown="handleScenarioInputKeydown(event)"
+                    />
+
+                    <button
+                        class="neobrutalist-btn px-6 py-3"
+                        onclick="submitCustomScenario()"
+                    >
+                        Ask Coach
+                    </button>
+                </div>
+
+                <p class="text-label-sm mt-2 text-stone-500">
+                    Type a life or market scenario and the coach will turn it into a simple plan and chart update.
+                </p>
+            </div>
+
+            <div class="sketch-border p-4 mt-6 bg-stone-50">
+                <p class="text-label-bold uppercase">Coach says:</p>
+                <h3 id="coach-title" class="text-headline-md font-headline-md mt-2">Choose a what-if scenario</h3>
+                <p id="coach-explanation" class="text-body-md mt-2">
+                    I’ll explain what could happen and how rebalancing may help.
+                </p>
+                <p id="coach-recommendation" class="text-body-md mt-3 font-bold">
+                    Your rebalance plan will appear here.
+                </p>
+                <ul id="coach-steps" class="list-disc pl-6 mt-3 text-body-md"></ul>
+                <p id="coach-difference" class="text-body-md mt-4" style="color: #196ad4; font-weight: 800;">
+                    The chart will update after you choose a scenario.
+                </p>
+                <p id="coach-disclaimer" class="text-label-sm mt-3 text-stone-500">
+                    Educational estimate only, not financial advice.
+                </p>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-header">
+                <div>
+                    <p class="slider-kicker">Timeline Scrubber</p>
+                    <h3>Year <span id="year-display">2026</span></h3>
+                </div>
+                <div class="slider-year-pill">Drag To Compare</div>
+            </div>
+            <input type="range" id="year-slider" min="0" max="30" value="0">
+            <p class="slider-caption">Projecting up to 30 years in the future.</p>
+        </div>
+
         <div class="twin-container" style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
             <div class="neobrutalist-card twin-card p-4" style="flex: 1; text-align: center;">
                 <img src="./cowIcons/sadCow.png" class="w-20 h-20 mx-auto object-contain" />
                 <h3 class="text-headline-md font-headline-md mt-2">Current You</h3>
-                <p>Status Quo Portfolio (5% APY)</p>
+                <p id="current-subtitle">Status Quo Portfolio (5% APY)</p>
                 <h2 id="current-val" class="text-headline-lg font-headline-lg" style="margin-top: 1rem;">$10,000</h2>
             </div>
 
@@ -212,7 +396,7 @@
                 style="flex: 1; text-align: center; border: 4px solid #196ad4;">
                 <img src="./cowIcons/defaultCow.png" class="w-20 h-20 mx-auto object-contain" />
                 <h3 class="text-headline-md font-headline-md mt-2" style="color: #196ad4;">Rebalanced You</h3>
-                <p>Optimized Aura Path (8% APY)</p>
+                <p id="rebalanced-subtitle">Optimized Aura Path (8% APY)</p>
                 <h2 id="rebalanced-val" class="text-headline-lg font-headline-lg"
                     style="color: #196ad4; margin-top: 1rem;">$10,000</h2>
             </div>
@@ -223,12 +407,6 @@
                 <canvas id="growthChart"></canvas>
             </div>
         </div>
-
-        <div class="slider-container">
-            <h3>Year: <span id="year-display">2026</span></h3>
-            <input type="range" id="year-slider" min="0" max="30" value="0">
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Projecting up to 30 years in the future.</p>
-        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -238,6 +416,8 @@
         const yearDisplay = document.getElementById('year-display');
         const currentVal = document.getElementById('current-val');
         const rebalancedVal = document.getElementById('rebalanced-val');
+        const currentSubtitle = document.getElementById('current-subtitle');
+        const rebalancedSubtitle = document.getElementById('rebalanced-subtitle');
 
         const currentRate = 1.05; // 5%
         const rebalancedRate = 1.08; // 8%
@@ -245,8 +425,9 @@
 
         // Initialize Data
         const labels = Array.from({ length: 31 }, (_, i) => 2026 + i);
-        const currentData = labels.map((_, i) => baseAmount * Math.pow(currentRate, i));
-        const rebalancedData = labels.map((_, i) => baseAmount * Math.pow(rebalancedRate, i));
+        let currentData = labels.map((_, i) => baseAmount * Math.pow(currentRate, i));
+        let rebalancedData = labels.map((_, i) => baseAmount * Math.pow(rebalancedRate, i));
+        let activeScenario = null;
 
         const ctx = document.getElementById('growthChart').getContext('2d');
         const chart = new Chart(ctx, {
@@ -302,8 +483,183 @@
             }
         });
 
+        function buildProjection(assumptions, years = 30) {
+            const values = [baseAmount];
+
+            for (let i = 1; i <= years; i++) {
+                let next = values[i - 1];
+
+                if (i === 1 && typeof assumptions.yearOneShock === "number") {
+                    next = next * (1 + assumptions.yearOneShock);
+                }
+
+                if (
+                    typeof assumptions.withdrawalYear === "number" &&
+                    i === assumptions.withdrawalYear &&
+                    typeof assumptions.withdrawalPct === "number"
+                ) {
+                    next = next * (1 - assumptions.withdrawalPct);
+                }
+
+                const growth = typeof assumptions.annualGrowthAfterShock === "number"
+                    ? assumptions.annualGrowthAfterShock
+                    : 0.05;
+
+                next = next * (1 + growth);
+                values.push(next);
+            }
+
+            return values;
+        }
+
+        function setLoadingState() {
+            document.getElementById("coach-title").innerText = "Thinking...";
+            document.getElementById("coach-explanation").innerText = "The coach is building a simple what-if plan.";
+            document.getElementById("coach-recommendation").innerText = "";
+            document.getElementById("coach-steps").innerHTML = "";
+            document.getElementById("coach-difference").innerText = "Updating your projection...";
+        }
+
+        function setSelectedScenarioButton(scenarioKey) {
+            document.querySelectorAll(".scenario-btn").forEach(btn => {
+                btn.classList.toggle("selected", btn.dataset.scenario === scenarioKey);
+            });
+        }
+
+        function applyScenarioData(data) {
+            currentData = buildProjection(data.noRebalance, 30);
+            rebalancedData = buildProjection(data.rebalanced, 30);
+
+            chart.data.datasets[0].data = rebalancedData;
+            chart.data.datasets[0].label = data.rebalanced.label || "Rebalanced Strategy";
+
+            chart.data.datasets[1].data = currentData;
+            chart.data.datasets[1].label = data.noRebalance.label || "No Rebalance";
+
+            chart.update();
+
+            if (currentSubtitle) {
+                currentSubtitle.innerText = data.noRebalance.label || "No Rebalance";
+            }
+
+            if (rebalancedSubtitle) {
+                rebalancedSubtitle.innerText = data.rebalanced.label || "Rebalanced Strategy";
+            }
+
+            document.getElementById("coach-title").innerText = data.scenarioTitle || "What-If Scenario";
+            document.getElementById("coach-explanation").innerText = data.explanation || "";
+            document.getElementById("coach-recommendation").innerText = data.recommendedRebalance || "";
+
+            document.getElementById("coach-steps").innerHTML = (data.actionSteps || [])
+                .map(step => `<li>${step}</li>`)
+                .join("");
+
+            document.getElementById("coach-disclaimer").innerText =
+                data.disclaimer || "Educational estimate only, not financial advice.";
+
+            updateTwin();
+        }
+
+        async function selectScenario(scenarioKey) {
+            activeScenario = scenarioKey;
+            setSelectedScenarioButton(scenarioKey);
+            setLoadingState();
+
+            try {
+                const response = await fetch("/api/what-if", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        scenario: scenarioKey,
+                        baseAmount,
+                        years: 30
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to load what-if scenario");
+                }
+
+                const data = await response.json();
+                applyScenarioData(data);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("coach-title").innerText = "Couldn’t load scenario";
+                document.getElementById("coach-explanation").innerText =
+                    "Try again, or use the default projection for now.";
+                document.getElementById("coach-recommendation").innerText = "";
+                document.getElementById("coach-steps").innerHTML = "";
+                document.getElementById("coach-difference").innerText =
+                    "The chart is still showing the default projection.";
+            }
+        }
+
+        function handleScenarioInputKeydown(event) {
+            if (event.key === "Enter") {
+                submitCustomScenario();
+            }
+        }
+
+        function setSliderVisuals() {
+            const min = Number(slider.min || 0);
+            const max = Number(slider.max || 100);
+            const value = Number(slider.value || 0);
+            const progress = ((value - min) / (max - min)) * 100;
+            slider.style.setProperty("--slider-progress", `${progress}%`);
+        }
+
+        async function submitCustomScenario() {
+            const input = document.getElementById("custom-scenario-input");
+            const customScenario = input.value.trim();
+
+            if (!customScenario) {
+                document.getElementById("coach-title").innerText = "Type a scenario first";
+                document.getElementById("coach-explanation").innerText =
+                    "Example: What if I need to withdraw $3,000 next year?";
+                return;
+            }
+
+            activeScenario = "custom";
+            setSelectedScenarioButton(null);
+            setLoadingState();
+
+            try {
+                const response = await fetch("/api/what-if", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        scenario: "custom",
+                        customScenario,
+                        baseAmount,
+                        years: 30
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to load custom what-if scenario");
+                }
+
+                const data = await response.json();
+                applyScenarioData(data);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("coach-title").innerText = "Couldn’t load custom scenario";
+                document.getElementById("coach-explanation").innerText =
+                    "Try a simpler scenario like: What if the market drops 20%?";
+                document.getElementById("coach-recommendation").innerText = "";
+                document.getElementById("coach-steps").innerHTML = "";
+                document.getElementById("coach-difference").innerText =
+                    "The chart is still showing the previous projection.";
+            }
+        }
+
         function updateTwin() {
             const years = parseInt(slider.value);
+            setSliderVisuals();
             yearDisplay.innerText = 2026 + years;
 
             const curAmount = currentData[years];
@@ -312,10 +668,27 @@
             currentVal.innerText = '$' + curAmount.toLocaleString(undefined, { maximumFractionDigits: 0 });
             rebalancedVal.innerText = '$' + rebAmount.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-            // Highlight the current year on the chart via vertical line or tooltip (mocked by updating title)
+            const diff = rebAmount - curAmount;
+            const diffEl = document.getElementById("coach-difference");
+
+            if (diffEl) {
+                if (!activeScenario) {
+                    diffEl.innerText = "The chart will update after you choose a scenario.";
+                    return;
+                }
+
+                if (diff >= 0) {
+                    diffEl.innerText =
+                        `By ${2026 + years}, rebalancing is projected to be $${diff.toLocaleString(undefined, { maximumFractionDigits: 0 })} ahead of doing nothing.`;
+                } else {
+                    diffEl.innerText =
+                        `By ${2026 + years}, the safer rebalance trails by $${Math.abs(diff).toLocaleString(undefined, { maximumFractionDigits: 0 })}, but may reduce downside risk.`;
+                }
+            }
         }
 
         slider.addEventListener('input', updateTwin);
+        updateTwin();
     </script>
 
     <footer
