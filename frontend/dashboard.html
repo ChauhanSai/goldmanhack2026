@@ -476,33 +476,33 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4"
                                 onclick="selectPlaidBank('Chase')"
-                                style="flex-direction: column; align-items: center; text-align: center;">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                style="flex-direction: column; align-items: center; text-align: center; justify-content: center;">
+                                <img src="/assets/ChaseLogo.png" alt="Chase" style="height: 3rem; margin-bottom: 0.5rem; object-fit: contain;">
                                 <div style="font-weight: 500;">Chase</div>
                             </div>
                             <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4"
                                 onclick="selectPlaidBank('Bank of America')"
-                                style="flex-direction: column; align-items: center; text-align: center;">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                style="flex-direction: column; align-items: center; text-align: center; justify-content: center;">
+                                <img src="/assets/Bofa.png" alt="Bank of America" style="height: 3rem; margin-bottom: 0.5rem; object-fit: contain;">
                                 <div style="font-weight: 500;">Bank of America</div>
                             </div>
                             <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4"
                                 onclick="selectPlaidBank('Charles Schwab')"
-                                style="flex-direction: column; align-items: center; text-align: center;">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">📈</div>
+                                style="flex-direction: column; align-items: center; text-align: center; justify-content: center;">
+                                <img src="/assets/CharlesSchwab.png" alt="Charles Schwab" style="height: 3rem; margin-bottom: 0.5rem; object-fit: contain;">
                                 <div style="font-weight: 500;">Charles Schwab</div>
                             </div>
                             <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4"
                                 onclick="selectPlaidBank('Goldman Sachs')"
-                                style="flex-direction: column; align-items: center; text-align: center;">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏛️</div>
+                                style="flex-direction: column; align-items: center; text-align: center; justify-content: center;">
+                                <img src="/assets/GoldmanLogo.png" alt="Goldman Sachs" style="height: 3rem; margin-bottom: 0.5rem; object-fit: contain;">
                                 <div style="font-weight: 500;">Goldman Sachs</div>
                             </div>
                         </div>
                     </div>
 
                     <div id="plaid-step-login" style="display: none; text-align: center;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;" id="plaid-login-logo">🏦</div>
+                        <img id="plaid-login-logo" src="" alt="Bank Logo" style="height: 4rem; margin-bottom: 1rem; object-fit: contain; display: inline-block;">
                         <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Log in to <span
                                 id="plaid-login-bank"></span></h2>
                         <div class="form-group" style="text-align: left;">
@@ -587,7 +587,7 @@
                                     style="width: 50px; height: 50px; background: var(--brand-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">
                                     AF</div>
                                 <div style="color: var(--text-muted); font-size: 1.5rem;">&#8646;</div>
-                                <div style="font-size: 2rem;" id="plaid-consent-logo">🏦</div>
+                                <img id="plaid-consent-logo" src="" alt="Bank Logo" style="height: 2.5rem; object-fit: contain; display: inline-block;">
                             </div>
                             <p style="color: var(--text-muted); font-size: 0.95rem;">Aura Finance wants to access your
                                 <span id="plaid-consent-bank" style="font-weight:600; color: var(--text-main);"></span>
@@ -1108,6 +1108,16 @@
             plaidSelectedBank = bank;
             document.getElementById('plaid-login-bank').innerText = bank;
             document.getElementById('plaid-consent-bank').innerText = bank;
+            
+            let logoSrc = '';
+            if (bank === 'Chase') logoSrc = '/assets/ChaseLogo.png';
+            else if (bank === 'Bank of America') logoSrc = '/assets/Bofa.png';
+            else if (bank === 'Charles Schwab') logoSrc = '/assets/CharlesSchwab.png';
+            else if (bank === 'Goldman Sachs') logoSrc = '/assets/GoldmanLogo.png';
+            
+            document.getElementById('plaid-login-logo').src = logoSrc;
+            document.getElementById('plaid-consent-logo').src = logoSrc;
+            
             showPlaidStep('plaid-step-login', `Log in to ${bank}`, true);
         }
 
