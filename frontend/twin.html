@@ -411,6 +411,52 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/app.js"></script>
     <script>
+        const PORTFOLIO_STORAGE_KEY = 'mm_portfolio';
+        const DEFAULT_PORTFOLIO = [
+            { ticker: 'AAPL', value: 15000 },
+            { ticker: 'TSLA', value: 8500 },
+            { ticker: 'VOO', value: 40000 }
+        ];
+
+        function normalizePortfolioSnapshot(rawPortfolio) {
+            if (!Array.isArray(rawPortfolio)) return [];
+
+            const combined = new Map();
+            rawPortfolio.forEach((holding) => {
+                const ticker = String(holding?.ticker || '')
+                    .trim()
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9.-]/g, '')
+                    .slice(0, 12);
+                const value = Number(holding?.value);
+                if (!ticker || !Number.isFinite(value) || value <= 0) return;
+                combined.set(ticker, (combined.get(ticker) || 0) + value);
+            });
+
+            return Array.from(combined.entries())
+                .map(([ticker, value]) => ({ ticker, value: Number(value.toFixed(2)) }))
+                .sort((a, b) => b.value - a.value);
+        }
+
+        function loadTwinPortfolio() {
+            try {
+                const raw = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+                if (!raw) return normalizePortfolioSnapshot(DEFAULT_PORTFOLIO);
+                const parsed = JSON.parse(raw);
+                const normalized = normalizePortfolioSnapshot(parsed);
+                return normalized.length ? normalized : normalizePortfolioSnapshot(DEFAULT_PORTFOLIO);
+            } catch (error) {
+                console.error('Could not load dashboard portfolio snapshot.', error);
+                return normalizePortfolioSnapshot(DEFAULT_PORTFOLIO);
+            }
+        }
+
+        function getPortfolioTotal(portfolioSnapshot) {
+            const total = portfolioSnapshot.reduce((sum, holding) => sum + Number(holding.value || 0), 0);
+            return total > 0 ? total : 0;
+        }
+
+        let dashboardPortfolio = loadTwinPortfolio();
         const slider = document.getElementById('year-slider');
         const yearDisplay = document.getElementById('year-display');
         const currentVal = document.getElementById('current-val');
@@ -420,10 +466,13 @@
 
         const currentRate = 1.05; // 5%
         const rebalancedRate = 1.08; // 8%
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const queryVal = urlParams.get('value');
-        const baseAmount = queryVal && !isNaN(parseFloat(queryVal)) ? parseFloat(queryVal) : 10000;
+        let baseAmount = getPortfolioTotal(dashboardPortfolio);
+        if (!baseAmount) {
+            baseAmount = queryVal && !isNaN(parseFloat(queryVal)) ? parseFloat(queryVal) : 10000;
+        }
 
         // Initialize Data
         const labels = Array.from({ length: 31 }, (_, i) => 2026 + i);
@@ -563,6 +612,12 @@
         }
 
         async function selectScenario(scenarioKey) {
+            dashboardPortfolio = loadTwinPortfolio();
+            const latestPortfolioTotal = getPortfolioTotal(dashboardPortfolio);
+            if (latestPortfolioTotal > 0) {
+                baseAmount = latestPortfolioTotal;
+            }
+
             activeScenario = scenarioKey;
             setSelectedScenarioButton(scenarioKey);
             setLoadingState();
@@ -576,7 +631,8 @@
                     body: JSON.stringify({
                         scenario: scenarioKey,
                         baseAmount,
-                        years: 30
+                        years: 30,
+                        portfolio: dashboardPortfolio
                     })
                 });
 
@@ -613,6 +669,12 @@
         }
 
         async function submitCustomScenario() {
+            dashboardPortfolio = loadTwinPortfolio();
+            const latestPortfolioTotal = getPortfolioTotal(dashboardPortfolio);
+            if (latestPortfolioTotal > 0) {
+                baseAmount = latestPortfolioTotal;
+            }
+
             const input = document.getElementById("custom-scenario-input");
             const customScenario = input.value.trim();
 
@@ -637,7 +699,8 @@
                         scenario: "custom",
                         customScenario,
                         baseAmount,
-                        years: 30
+                        years: 30,
+                        portfolio: dashboardPortfolio
                     })
                 });
 
