@@ -7,3 +7,4 @@ vaderSentiment
 networkx
 scikit-learn
 scipy
+yfinance
