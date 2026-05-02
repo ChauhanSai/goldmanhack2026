@@ -16,6 +16,10 @@
 backend/venv/
 backend/node_modules/
 __pycache__/
+.pytest_cache/
+backend/stock_cache.json
 
 # Frontend
 .vite/
+
+# Caches

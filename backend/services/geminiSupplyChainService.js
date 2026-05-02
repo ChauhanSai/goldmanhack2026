@@ -162,9 +162,7 @@ Rules:
   return {
     ...payload,
     source: "gemini_ai_estimate",
-    warnings: [
-      "This relationship map is AI-estimated from general public knowledge, not verified real-time supplier data.",
-    ],
+    warnings: [],
     methodology: [
       "Used Gemini to infer likely suppliers, customers, competitors, and ecosystem exposures.",
       "Fallback data is used if Gemini is unavailable or returns invalid JSON.",

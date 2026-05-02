@@ -3,16 +3,16 @@
 // Bread Bot Modal Logic
 function initBreadBot() {
     const body = document.querySelector('body');
-    
+
     // Inject the bot HTML into the page if it doesn't exist
     if (!document.getElementById('bread-bot-container')) {
         const botHTML = `
             <div id="bread-bot-container" style="position: fixed; bottom: 32px; right: 32px; z-index: 100;">
                 <div class="relative flex flex-col items-end">
                     
-                    <div id="bread-bot-modal" class="hidden mb-4 w-80 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex-col" style="border-radius: 0;">
+                    <div id="bread-bot-modal" class="hidden mb-4 w-96 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex-col" style="border-radius: 0;">
                         <div class="bg-[#196ad4] text-white p-4 border-b-4 border-black flex justify-between items-center">
-                            <span class="font-['Epilogue'] font-black uppercase">Bread Bot</span>
+                            <span class="font-['Epilogue'] font-black uppercase">Cash Cow</span>
                             <button id="bot-close" class="text-white hover:text-black font-bold text-2xl leading-none">&times;</button>
                         </div>
                         <div class="p-4 text-black">
@@ -70,11 +70,68 @@ function initBreadBot() {
                 body: JSON.stringify({ ticker })
             });
             const data = await response.json();
-            
+
+            const maxSignals = Math.max(data.total_buy, data.total_sell, data.total_hold, 1);
+            const buyH = (data.total_buy / maxSignals) * 100;
+            const sellH = (data.total_sell / maxSignals) * 100;
+            const holdH = (data.total_hold / maxSignals) * 100;
+
+            const sentPct = Math.max(0, Math.min(100, data.overall_sentiment * 100));
+            const profitability = 1 - data.profit_risk;
+
+            function getRiskColor(risk) {
+                if (risk < 0.4) return '#22c55e'; // green
+                if (risk < 0.7) return '#facc15'; // yellow
+                return '#ef4444'; // red
+            }
+
             resultDiv.innerHTML = `
-                <h3 class="font-['Epilogue'] font-bold text-lg mb-1" style="color: ${data.recommendation === 'BUY' ? '#196ad4' : '#000'}">${data.recommendation}</h3>
-                <p class="text-sm mb-2">${data.sentiment}</p>
-                <p class="text-xs font-bold bg-black text-white inline-block px-2 py-1">Confidence: ${(data.confidence * 100).toFixed(0)}%</p>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-['Epilogue'] font-black text-xl" style="color: ${data.recommendation === 'BUY' ? '#22c55e' : (data.recommendation === 'SELL' ? '#ef4444' : '#facc15')}">${data.recommendation}</h3>
+                    <span class="text-sm font-bold bg-black text-white px-2 py-1">${ticker}</span>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm font-bold mb-1">
+                        <span>Sentiment Score</span>
+                        <span>${data.overall_sentiment.toFixed(3)}/1.0</span>
+                    </div>
+                    <div class="w-full h-4 bg-white border-2 border-black rounded-none">
+                        <div class="h-full bg-black border-r-2 border-black" style="width: ${sentPct}%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-sm font-bold mb-1">Signals</div>
+                    <div class="flex items-end h-16 gap-2 border-b-2 border-black p-1">
+                        <div class="w-1/3 bg-[#22c55e] border-2 border-black" style="height: ${buyH}%;"></div>
+                        <div class="w-1/3 bg-[#ef4444] border-2 border-black" style="height: ${sellH}%;"></div>
+                        <div class="w-1/3 bg-[#facc15] border-2 border-black" style="height: ${holdH}%;"></div>
+                    </div>
+                    <div class="flex text-xs text-gray-500 font-bold mt-1 text-center">
+                        <div class="w-1/3">Buy (${data.total_buy})</div>
+                        <div class="w-1/3">Sell (${data.total_sell})</div>
+                        <div class="w-1/3">Hold (${data.total_hold})</div>
+                    </div>
+                </div>
+
+                <div class="mb-4 border-t-2 border-black pt-3">
+                    <div class="text-sm font-bold mb-1">Risks</div>
+                    <div class="flex justify-around">
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full border-2 border-black mb-1" style="background: conic-gradient(#ffffff ${100 - data.base_risk * 100}%, ${getRiskColor(data.base_risk)} 0);"></div>
+                            <span class="text-xs font-bold mt-1">Base Risk</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full border-2 border-black mb-1" style="background: conic-gradient(#ffffff ${100 - profitability * 100}%, ${getRiskColor(data.profit_risk)} 0);"></div>
+                            <span class="text-xs font-bold mt-1">Profitability %</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-sm font-bold bg-black text-white inline-block px-2 py-1">Confidence: ${(data.confidence * 100).toFixed(0)}%</p>
+                </div>
             `;
         } catch (e) {
             resultDiv.innerHTML = '<p class="text-red-600 font-bold">Error analyzing ticker.</p>';

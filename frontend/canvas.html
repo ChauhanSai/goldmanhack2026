@@ -283,6 +283,7 @@
             cursor: pointer;
         }
     </style>
+    <link rel="icon" type="image/png" href="./cowIcons/logo.png" />
     <title>Moore Money</title>
 </head>
 
@@ -317,8 +318,10 @@
             <div class="group" style="flex: 1; display: flex; position: relative;">
                 <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
                 <div id="disabled-prompt-tooltip"
-                    class="absolute -top-16 left-4 bg-white border-2 border-black p-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none" style="display: none;">
-                    <p class="font-bold font-['Work_Sans'] text-black text-sm">"Clear the canvas to set a new goal, boss!"</p>
+                    class="absolute -top-16 left-4 bg-white border-2 border-black p-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none"
+                    style="display: none;">
+                    <p class="font-bold font-['Work_Sans'] text-black text-sm">"Clear the canvas to set a new goal,
+                        boss!"</p>
                     <div
                         class="absolute bottom-[-10px] left-6 w-4 h-4 bg-white border-b-2 border-r-2 border-black rotate-45">
                     </div>
@@ -327,7 +330,8 @@
             <button class="neobrutalist-btn px-4 py-2" id="generate-btn" onclick="generateNodesFromPrompt()">
                 Generate Path
             </button>
-            <button class="neobrutalist-btn px-4 py-2" id="clear-btn" style="display: none; background-color: #ef4444;" onclick="clearCanvas()">
+            <button class="neobrutalist-btn px-4 py-2" id="clear-btn" style="display: none; background-color: #ef4444;"
+                onclick="clearCanvas()">
                 Clear Canvas
             </button>
         </div>
@@ -351,12 +355,18 @@
             </div>
 
             <!-- Node Edit Prompt Box (will be moved into viewport via JS) -->
-            <div id="node-edit-box" class="absolute hidden z-[200] bg-white border-4 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-64" style="border-radius: 0;">
+            <div id="node-edit-box"
+                class="absolute hidden z-[200] bg-white border-4 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-64"
+                style="border-radius: 0;">
                 <p class="font-['Epilogue'] font-black uppercase text-[10px] mb-2 text-[#196ad4]">Refine this step</p>
-                <textarea id="node-edit-prompt" class="w-full p-2 border-2 border-black font-['Work_Sans'] text-sm mb-3 focus:outline-none focus:ring-0" rows="2" placeholder="e.g. 'Add more risk'"></textarea>
+                <textarea id="node-edit-prompt"
+                    class="w-full p-2 border-2 border-black font-['Work_Sans'] text-sm mb-3 focus:outline-none focus:ring-0"
+                    rows="2" placeholder="e.g. 'Add more risk'"></textarea>
                 <div class="flex gap-2">
-                    <button id="rebalance-btn" class="flex-1 bg-[#196ad4] text-white border-2 border-black py-1 font-['Epilogue'] font-black uppercase text-[10px] hover:translate-x-0.5 hover:translate-y-0.5 transition-transform">Rebalance</button>
-                    <button id="cancel-edit-btn" class="bg-white text-black border-2 border-black px-2 font-['Epilogue'] font-black uppercase text-[10px]">X</button>
+                    <button id="rebalance-btn"
+                        class="flex-1 bg-[#196ad4] text-white border-2 border-black py-1 font-['Epilogue'] font-black uppercase text-[10px] hover:translate-x-0.5 hover:translate-y-0.5 transition-transform">Rebalance</button>
+                    <button id="cancel-edit-btn"
+                        class="bg-white text-black border-2 border-black px-2 font-['Epilogue'] font-black uppercase text-[10px]">X</button>
                 </div>
             </div>
         </div>
@@ -409,14 +419,14 @@
             viewportEl.style.width = '100%';
             viewportEl.style.height = '100%';
             viewportEl.style.transformOrigin = '0 0';
-            
+
             // Move SVG into viewport
             canvasEl.insertBefore(viewportEl, svgLayer);
             viewportEl.appendChild(svgLayer);
-            
+
             // Move Edit Box into viewport so it transforms with nodes
             viewportEl.appendChild(nodeEditBox);
-            
+
             updateViewportTransform();
         }
 
@@ -523,7 +533,7 @@
 
                 div.addEventListener('click', e => {
                     // Only show edit box if we didn't drag the node
-                    if (Math.abs(node.x - startNodeX) > 5 || Math.abs(node.y - startNodeY) > 5) return; 
+                    if (Math.abs(node.x - startNodeX) > 5 || Math.abs(node.y - startNodeY) > 5) return;
                     showNodeEditBox(node.id, node.x, node.y, div.offsetWidth, div.offsetHeight);
                 });
 
@@ -540,19 +550,19 @@
             const zoomSpeed = 0.001;
             const delta = -e.deltaY;
             const factor = Math.pow(1.1, delta / 100);
-            
+
             const oldScale = scale;
             scale = Math.min(Math.max(0.1, scale * factor), 5);
-            
+
             // Adjust offset to zoom into mouse position
             const rect = canvasEl.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
-            
+
             // Formula: newOffset = mousePos - (mousePos - oldOffset) * (newScale / oldScale)
             offsetX = mouseX - (mouseX - offsetX) * (scale / oldScale);
             offsetY = mouseY - (mouseY - offsetY) * (scale / oldScale);
-            
+
             updateViewportTransform();
         }, { passive: false });
 
@@ -574,11 +584,11 @@
                 // clientX = (node.x * scale) + offsetX + canvasRect.left
                 // So node.x = (clientX - offsetX - canvasRect.left) / scale
                 const rect = canvasEl.getBoundingClientRect();
-                let newX = (e.clientX - offsetX - rect.left) / scale - (dragOffX - (rect.left + offsetX)/scale);
+                let newX = (e.clientX - offsetX - rect.left) / scale - (dragOffX - (rect.left + offsetX) / scale);
                 // Wait, simpler:
                 // dragOffX was (e.clientX / scale) - node.x at start.
                 // node.x = (e.clientX / scale) - dragOffX
-                
+
                 newX = (e.clientX / scale) - dragOffX;
                 let newY = (e.clientY / scale) - dragOffY;
 
@@ -676,13 +686,13 @@
         function showNodeEditBox(id, x, y, w, h) {
             editingNodeId = id;
             nodeEditBox.style.display = 'block';
-            
-            const boxW = 256; 
-            const boxH = 120; 
-            
-            nodeEditBox.style.left = (x + w/2 - boxW/2) + 'px';
-            nodeEditBox.style.top = (y + h/2 - boxH/2) + 'px';
-            
+
+            const boxW = 256;
+            const boxH = 120;
+
+            nodeEditBox.style.left = (x + w / 2 - boxW / 2) + 'px';
+            nodeEditBox.style.top = (y + h / 2 - boxH / 2) + 'px';
+
             nodeEditPrompt.value = '';
             nodeEditPrompt.focus();
         }
@@ -694,10 +704,10 @@
         rebalanceBtn.addEventListener('click', async () => {
             const refinement = nodeEditPrompt.value.trim();
             if (!refinement) return;
-            
+
             nodeEditBox.style.display = 'none';
             loadingEl.style.display = 'flex';
-            
+
             try {
                 const res = await fetch('/api/canvas/rebalance', {
                     method: 'POST',
@@ -709,7 +719,7 @@
                         refinement: refinement
                     })
                 });
-                
+
                 if (!res.ok) throw new Error('Rebalance failed');
                 const data = await res.json();
                 nodesData = data.nodes || [];
@@ -730,15 +740,7 @@
     <footer
         class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
         <div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
-        <div class="flex gap-8">
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
-                href="#">Terms</a>
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
-                href="#">Privacy</a>
-            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle
-                Guide</a>
-        </div>
-        <div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
+        <div class="font-['Epilogue'] font-medium text-sm text-stone-600 pr-24 md:pr-[5%]">© 2026 MOORE MONEY.</div>
     </footer>
 </body>
 
