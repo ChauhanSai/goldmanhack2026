@@ -1,154 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Aura Finance</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            "colors": {
+                "surface": "#f9f9ff",
+                "on-surface": "#191c22",
+                "primary": "#0052ac",
+                "primary-container": "#196ad4",
+                "on-primary-container": "#ecf0ff",
+                "background": "#f9f9ff",
+                "on-background": "#191c22",
+                "surface-container": "#ecedf7",
+            },
+            "borderRadius": {
+                "DEFAULT": "0px",
+                "lg": "0px",
+                "xl": "0px",
+                "full": "0px"
+            },
+            "spacing": {
+                "xl": "64px",
+                "base": "8px",
+                "md": "24px",
+                "gutter": "24px",
+                "lg": "48px",
+                "margin": "32px",
+                "sm": "12px",
+                "xs": "4px"
+            },
+            "fontFamily": {
+                "label-sm": ["Work Sans", "sans-serif"],
+                "body-md": ["Work Sans", "sans-serif"],
+                "body-lg": ["Work Sans", "sans-serif"],
+                "headline-md": ["Epilogue", "sans-serif"],
+                "headline-lg": ["Epilogue", "sans-serif"],
+                "headline-xl": ["Epilogue", "sans-serif"],
+                "label-bold": ["Work Sans", "sans-serif"]
+            },
+            "fontSize": {
+                "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
         }
-        .exposure-section {
-            margin-top: 1.5rem;
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-        .tag {
-            display: inline-block;
-            background: #e2e8f0;
-            padding: 0.35rem 0.85rem;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            margin: 0.25rem;
-            color: var(--text-main);
-            font-weight: 500;
-        }
-        .tag.risk-high { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-        .tag.risk-med { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
-        .tag.risk-low { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
-        .scan-toolbar {
-            display: flex;
-            align-items: flex-end;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-        .scan-toolbar label {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .scan-toolbar input {
-            min-width: 140px;
-            margin-bottom: 0;
-            text-transform: uppercase;
-        }
-        .summary-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-        .summary-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .summary-badge {
-            display: inline-block;
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .summary-badge.source {
-            background: #e0f2fe;
-            color: #075985;
-        }
-        .summary-badge.risk-high {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        .summary-badge.risk-med {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .summary-badge.risk-low {
-            background: #d1fae5;
-            color: #047857;
-        }
-        .inline-message {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            border: 1px solid transparent;
-        }
-        .inline-message.warning {
-            background: #fff7ed;
-            border-color: #fdba74;
-            color: #9a3412;
-        }
-        .inline-message.error {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            color: #b91c1c;
-        }
-        .item-stack {
-            display: grid;
-            gap: 0.75rem;
-        }
-        .risk-item {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.85rem 1rem;
-            background: #ffffff;
-        }
-        .risk-item-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 0.35rem;
-        }
-        .risk-item-header strong {
-            color: var(--text-main);
-        }
-        .empty-state {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        .risk-list {
-            margin: 0;
-            padding-left: 1.1rem;
-            color: var(--text-muted);
-        }
-    </style>
+    }
+}
+</script>
+<style>
+    body { font-family: 'Work Sans', sans-serif; background-color: #f9f9ff; color: #191c22; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Epilogue', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .neobrutalist-card {
+        border: 3px solid black;
+        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        transition: all 0.1s ease;
+        background-color: white;
+        border-radius: 0px;
+    }
+    .neobrutalist-card:active {
+        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        transform: translate(8px, 8px);
+    }
+    .neobrutalist-btn {
+        border: 4px solid black;
+        box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        transition: all 0.1s ease;
+        background-color: #196ad4;
+        color: white;
+        font-family: 'Epilogue', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 0px;
+    }
+    .neobrutalist-btn:active {
+        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        transform: translate(4px, 4px);
+    }
+    .sketch-border {
+        border: 3px solid black;
+        position: relative;
+    }
+    .sketch-border::after {
+        content: '';
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        border: 1px solid black;
+        pointer-events: none;
+        opacity: 0.2;
+    }
+    /* Two-column dashboard layout */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+    @media (max-width: 768px) {
+        .dashboard-grid { grid-template-columns: 1fr; }
+    }
+    /* Holdings list */
+    .holding-row {
+        padding: 0.75rem 0;
+        border-bottom: 2px solid #191c22;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .holding-row:last-child { border-bottom: none; }
+    /* Exposure tags */
+    .tag {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border: 2px solid black;
+        font-family: 'Work Sans', sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin: 0.25rem;
+    }
+    .risk-med  { background: #fef08a; color: #191c22; }
+    .risk-high { background: #fca5a5; color: #191c22; }
+    .exposure-section { margin-bottom: 1.5rem; }
+    /* Modal */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 1000;
+        display: none; justify-content: center; align-items: center;
+    }
+    .modal-content {
+        border: 4px solid black;
+        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        background: white;
+        border-radius: 0;
+        padding: 2rem;
+        max-width: 500px;
+        width: 100%;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem; cursor: pointer;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 700; font-size: 0.9rem; }
+    .form-group input, .form-group select {
+        width: 100%; padding: 0.6rem 0.75rem;
+        border: 2px solid black; font-family: 'Work Sans', sans-serif;
+        font-size: 1rem; outline: none; border-radius: 0;
+    }
+    .modal-header { margin-bottom: 1.25rem; }
+    .modal-options { display: flex; flex-direction: column; gap: 0.75rem; }
+    .icon { font-size: 1.5rem; }
+    .title { font-weight: 700; font-family: 'Epilogue', sans-serif; }
+    .desc  { font-size: 0.85rem; color: #64748b; }
+    .plaid-connect { text-align: center; padding: 2rem; }
+    .plaid-spinner {
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #196ad4;
+        width: 40px; height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem auto;
+        border-radius: 50%;
+    }
+    @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+</style>
+<title>Moore Money</title>
 </head>
-<body>
-    <nav>
-        <div class="logo">Aura Finance</div>
-        <div class="links">
-            <a href="/dashboard" class="active">Portfolio</a>
-            <a href="/canvas">Goals Canvas</a>
-            <a href="/twin">Financial Twin</a>
-            <a href="/" style="margin-left: 2rem; color: #ef4444;">Logout</a>
-        </div>
-    </nav>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <header class="bg-stone-50 border-b-4 border-black w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+<div class="text-2xl font-black text-black italic font-['Epilogue'] tracking-tighter uppercase">MOORE MONEY</div>
+<nav class="hidden md:flex gap-8">
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/dashboard">Portfolio</a>
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/canvas">Goals Canvas</a>
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/twin">Financial Twin</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="neobrutalist-btn px-6 py-2">Join Herd</button>
+<img alt="Mascot Profile" src="./cowIcons/peekingCow.png" class="w-10 h-10 border-2 border-black object-cover" />
+</div>
+</header>
 
-    <main>
+    <main class="max-w-7xl mx-auto px-4 pt-12 pb-12">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <h1>Portfolio Dashboard</h1>
             <div class="scan-toolbar">
@@ -161,22 +206,17 @@
         </div>
 
         <div class="dashboard-grid">
-            <div class="card">
-                <h3>Asset Allocation</h3>
-                <div style="height: 250px; margin-bottom: 1.5rem;">
+            <!-- LEFT: Asset Allocation -->
+            <div class="neobrutalist-card p-6">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="text-headline-md font-headline-md" style="margin: 0;">Asset Allocation</h3>
+                    <button class="neobrutalist-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;" onclick="openManageModal()">+ Manage</button>
+                </div>
+                <!-- explicit height so Chart.js can render the doughnut -->
+                <div style="position: relative; height: 280px; margin-bottom: 1.5rem;">
                     <canvas id="allocationChart"></canvas>
                 </div>
-                <ul style="list-style: none;">
-                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
-                        <strong>AAPL</strong> <span style="color: var(--text-muted);">$15,000</span>
-                    </li>
-                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
-                        <strong>TSLA</strong> <span style="color: var(--text-muted);">$8,500</span>
-                    </li>
-                    <li style="padding: 1rem 0; display: flex; justify-content: space-between;">
-                        <strong>VOO</strong> <span style="color: var(--text-muted);">$40,000</span>
-                    </li>
-                </ul>
+                <ul id="holdings-list" style="list-style: none; padding: 0; margin: 0;"></ul>
             </div>
 
             <div class="card" id="exposure-panel">
@@ -201,16 +241,16 @@
                     </div>
 
                     <div class="exposure-section">
-                        <h4 style="color: var(--brand-blue); display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-size: 1.25rem;">🔗</span> Supply Chain Dependency
+                        <h4 style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                            &#x1F517; Supply Chain Dependency
                         </h4>
                         <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top supplier dependencies or input categories that may matter for this business.</p>
                         <div id="suppliers-list"></div>
                     </div>
 
                     <div class="exposure-section">
-                        <h4 style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-size: 1.25rem;">⚔️</span> Competitor Ecosystem Risk
+                        <h4 style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                            &#x2694;&#xFE0F; Competitor Ecosystem Risk
                         </h4>
                         <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top competitor names that may pressure market share or ecosystem positioning.</p>
                         <div id="competitors-list"></div>
@@ -218,31 +258,522 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modals -->
+        <div id="manageModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Manage Portfolio</h2>
+                    <p style="font-size: 0.9rem;">How would you like to update your holdings?</p>
+                </div>
+                <div class="modal-options">
+                    <button class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="startPlaidFlow()">
+                        <div class="icon">🏦</div>
+                        <div class="details">
+                            <div class="title">Connect Institution</div>
+                            <div class="desc">Link your broker securely via Plaid.</div>
+                        </div>
+                    </button>
+                    <button class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="openCsvModal()">
+                        <div class="icon">📄</div>
+                        <div class="details">
+                            <div class="title">Upload CSV</div>
+                            <div class="desc">Import statements from major brokers.</div>
+                        </div>
+                    </button>
+                    <button class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="openManualModal()">
+                        <div class="icon">✍️</div>
+                        <div class="details">
+                            <div class="title">Manual Entry</div>
+                            <div class="desc">Add assets one by one.</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="plaidModal" class="modal-overlay">
+            <div class="modal-content" style="text-align: center; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                <div id="plaid-header" style="display: flex; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--border-color); position: relative; background: #fff;">
+                    <span id="plaid-back" style="cursor: pointer; font-size: 1.25rem; color: var(--text-main); display: none;" onclick="goBackPlaid()">&#8592;</span>
+                    <h2 id="plaid-title" style="flex: 1; margin: 0; font-size: 1.1rem; font-weight: 600;">Select your bank</h2>
+                    <span class="modal-close" style="position: absolute; right: 1.5rem; top: 1.5rem; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);" onclick="closeAllModals()">&times;</span>
+                </div>
+
+                <div style="padding: 1.5rem; text-align: left; max-height: 70vh; overflow-y: auto;">
+                    
+                    <div id="plaid-step-bank">
+                        <input type="text" id="plaid-search" placeholder="Search for your bank" style="width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-size: 1rem; background: #f8fafc;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="selectPlaidBank('Chase')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                <div style="font-weight: 500;">Chase</div>
+                            </div>
+                            <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="selectPlaidBank('Bank of America')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏦</div>
+                                <div style="font-weight: 500;">Bank of America</div>
+                            </div>
+                            <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="selectPlaidBank('Charles Schwab')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">📈</div>
+                                <div style="font-weight: 500;">Charles Schwab</div>
+                            </div>
+                            <div class="neobrutalist-card p-4 flex gap-4 cursor-pointer mb-4" onclick="selectPlaidBank('Goldman Sachs')" style="flex-direction: column; align-items: center; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; margin-right: 0;">🏛️</div>
+                                <div style="font-weight: 500;">Goldman Sachs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="plaid-step-login" style="display: none; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;" id="plaid-login-logo">🏦</div>
+                        <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Log in to <span id="plaid-login-bank"></span></h2>
+                        <div class="form-group" style="text-align: left;">
+                            <input type="text" id="plaid-username" placeholder="User ID" style="margin-bottom: 1rem;">
+                            <div style="position: relative;">
+                                <input type="password" id="plaid-password" placeholder="Password">
+                                <span style="position: absolute; right: 1rem; top: 0.75rem; cursor: pointer; color: var(--brand-blue); font-size: 0.9rem; font-weight: 500;" onclick="togglePlaidPassword()">Show</span>
+                            </div>
+                            <p id="plaid-login-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">Invalid credentials. Please try again.</p>
+                        </div>
+                        <button class="neobrutalist-btn px-4 py-2" style="width: 100%; margin-top: 1rem; background: #111;" onclick="submitPlaidLogin()">Submit</button>
+                    </div>
+
+                    <div id="plaid-step-mfa" style="display: none; text-align: left;">
+                        <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Please select a method to verify your identity.</p>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background: #f8fafc;">
+                                <input type="radio" name="plaid-mfa" checked>
+                                <span>Text message to ***-***-1234</span>
+                            </label>
+                        </div>
+                        <div id="plaid-mfa-input-section">
+                            <label style="font-weight: 500; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Enter verification code</label>
+                            <input type="text" id="plaid-mfa-code" placeholder="6-digit code" maxlength="6" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <p id="plaid-mfa-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">Invalid code.</p>
+                        </div>
+                        <button class="neobrutalist-btn px-4 py-2" style="width: 100%; margin-top: 1.5rem; background: #111;" onclick="submitPlaidMfa()">Submit</button>
+                    </div>
+
+                    <div id="plaid-step-accounts" style="display: none; text-align: left;">
+                        <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Choose which accounts to share with Aura Finance.</p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked class="plaid-account-cb">
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Checking</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">••••1234</div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 500;">$5,400.00</div>
+                            </label>
+                            <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked class="plaid-account-cb">
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Individual Brokerage</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">••••6789</div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 500;">$65,444.45</div>
+                            </label>
+                        </div>
+                        <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;" onclick="submitPlaidAccounts()">Continue</button>
+                    </div>
+
+                    <div id="plaid-step-consent" style="display: none; text-align: left;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="width: 50px; height: 50px; background: var(--brand-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">AF</div>
+                                <div style="color: var(--text-muted); font-size: 1.5rem;">&#8646;</div>
+                                <div style="font-size: 2rem;" id="plaid-consent-logo">🏦</div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">Aura Finance wants to access your <span id="plaid-consent-bank" style="font-weight:600; color: var(--text-main);"></span> data.</p>
+                        </div>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Data being shared:</p>
+                            <ul style="list-style-type: none; font-size: 0.85rem; color: var(--text-muted);">
+                                <li style="margin-bottom: 0.5rem;">✓ Account and routing numbers</li>
+                                <li style="margin-bottom: 0.5rem;">✓ Account balances</li>
+                                <li style="margin-bottom: 0.5rem;">✓ Historical transactions</li>
+                                <li>✓ Investment holdings</li>
+                            </ul>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem;">Secured by Plaid. You can revoke access anytime.</p>
+                        <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;" onclick="submitPlaidConsent()">Allow</button>
+                    </div>
+
+                    <div id="plaid-step-success" style="display: none; text-align: center; padding: 2rem 0;">
+                        <div style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">✅</div>
+                        <h2 style="margin-bottom: 0.5rem;">Account connected</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 2rem;">You're all set.</p>
+                        <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;" onclick="finishPlaidSuccess()">Done</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="csvModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Upload CSV</h2>
+                    <p style="font-size: 0.9rem;">Import exported statements.</p>
+                </div>
+                <div class="form-group">
+                    <label>Institution Format</label>
+                    <select id="csv-institution">
+                        <option value="gs">Goldman Sachs</option>
+                        <option value="jpmc">JPMorgan Chase</option>
+                        <option value="schwab">Charles Schwab</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>CSV File</label>
+                    <input type="file" id="csv-file" accept=".csv">
+                </div>
+                <button class="neobrutalist-btn px-4 py-2" style="width: 100%; margin-top: 1rem;" onclick="processCsv()">Import Data</button>
+            </div>
+        </div>
+
+        <div id="manualModal" class="modal-overlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeAllModals()">&times;</span>
+                <div class="modal-header">
+                    <h2>Add Asset Manually</h2>
+                </div>
+                <div class="form-group">
+                    <label>Ticker Symbol</label>
+                    <input type="text" id="manual-ticker" placeholder="e.g. AAPL">
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="manual-quantity" placeholder="e.g. 50">
+                </div>
+                <div class="form-group">
+                    <label>Price per Share ($)</label>
+                    <input type="number" id="manual-price" placeholder="e.g. 150.00">
+                </div>
+                <button class="neobrutalist-btn px-4 py-2" style="width: 100%; margin-top: 1rem;" onclick="addManualAsset()">Add to Portfolio</button>
+            </div>
+        </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/app.js"></script>
     <script>
-        // Initialize Chart.js
-        const ctx = document.getElementById('allocationChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['AAPL', 'TSLA', 'VOO'],
-                datasets: [{
-                    data: [15000, 8500, 40000],
-                    backgroundColor: ['#7399c6', '#3b82f6', '#94a3b8'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
-                },
-                cutout: '70%'
+        let portfolio = [
+            { ticker: 'AAPL', value: 15000 },
+            { ticker: 'TSLA', value: 8500 },
+            { ticker: 'VOO', value: 40000 }
+        ];
+
+        let allocationChart;
+
+        // Neobrutalist-palette colors — solid, high-contrast, no gradients
+        const NEO_COLORS = ['#196ad4','#000000','#f59e0b','#ef4444','#10b981','#8b5cf6','#ec4899','#14b8a6','#f43f5e','#6366f1'];
+
+        function renderPortfolio() {
+            const list = document.getElementById('holdings-list');
+            list.innerHTML = '';
+            let labels = [];
+            let data = [];
+            const total = portfolio.reduce((s, a) => s + a.value, 0);
+
+            portfolio.forEach((asset, i) => {
+                labels.push(asset.ticker);
+                data.push(asset.value);
+                const pct = total > 0 ? ((asset.value / total) * 100).toFixed(1) : 0;
+                const color = NEO_COLORS[i % NEO_COLORS.length];
+                list.innerHTML += `
+                    <li class="holding-row">
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <span style="display:inline-block;width:14px;height:14px;background:${color};border:2px solid #000;flex-shrink:0;"></span>
+                            <strong style="font-family:'Epilogue',sans-serif;font-size:1rem;">${asset.ticker}</strong>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <span style="font-weight:700;">$${asset.value.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+                            <span style="font-size:0.8rem;color:#64748b;min-width:42px;text-align:right;">${pct}%</span>
+                            <button style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.4rem;line-height:1;" onclick="removeAsset('${asset.ticker}')" title="Remove">&times;</button>
+                        </div>
+                    </li>
+                `;
+            });
+
+            if (allocationChart) {
+                allocationChart.data.labels = labels;
+                allocationChart.data.datasets[0].data = data;
+                allocationChart.data.datasets[0].backgroundColor = NEO_COLORS.slice(0, data.length);
+                allocationChart.update();
+            } else {
+                const ctx = document.getElementById('allocationChart').getContext('2d');
+                allocationChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: NEO_COLORS.slice(0, data.length),
+                            borderColor: '#000',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: { family: 'Work Sans', weight: '700', size: 13 },
+                                    padding: 16,
+                                    boxWidth: 14,
+                                    usePointStyle: false
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const val = ctx.parsed;
+                                        const t = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                                        const pct = t > 0 ? ((val/t)*100).toFixed(1) : 0;
+                                        return ` $${val.toLocaleString()} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
             }
-        });
+        }
+
+        renderPortfolio();
+
+        function removeAsset(ticker) {
+            portfolio = portfolio.filter(a => a.ticker !== ticker);
+            renderPortfolio();
+        }
+
+        function openManageModal() {
+            closeAllModals();
+            document.getElementById('manageModal').style.display = 'flex';
+        }
+
+        function openCsvModal() {
+            closeAllModals();
+            document.getElementById('csvModal').style.display = 'flex';
+        }
+
+        function openManualModal() {
+            closeAllModals();
+            document.getElementById('manualModal').style.display = 'flex';
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        let plaidSelectedBank = '';
+
+        function startPlaidFlow() {
+            closeAllModals();
+            document.getElementById('plaidModal').style.display = 'flex';
+            showPlaidStep('plaid-step-bank', 'Select your bank', false);
+            document.getElementById('plaid-username').value = '';
+            document.getElementById('plaid-password').value = '';
+            document.getElementById('plaid-login-error').style.display = 'none';
+            document.getElementById('plaid-mfa-code').value = '';
+            document.getElementById('plaid-mfa-error').style.display = 'none';
+        }
+
+        function showPlaidStep(stepId, title, showBack) {
+            ['plaid-step-bank', 'plaid-step-login', 'plaid-step-mfa', 'plaid-step-accounts', 'plaid-step-consent', 'plaid-step-success'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+            document.getElementById(stepId).style.display = 'block';
+            
+            document.getElementById('plaid-title').innerText = title;
+            document.getElementById('plaid-back').style.display = showBack ? 'block' : 'none';
+        }
+
+        function goBackPlaid() {
+            const steps = ['plaid-step-bank', 'plaid-step-login', 'plaid-step-mfa', 'plaid-step-accounts', 'plaid-step-consent'];
+            let visibleIndex = -1;
+            steps.forEach((id, idx) => {
+                if(document.getElementById(id).style.display === 'block') visibleIndex = idx;
+            });
+            
+            if (visibleIndex === 1) showPlaidStep('plaid-step-bank', 'Select your bank', false);
+            else if (visibleIndex === 2) showPlaidStep('plaid-step-login', `Log in to ${plaidSelectedBank}`, true);
+            else if (visibleIndex === 3) showPlaidStep('plaid-step-mfa', 'Verify your identity', true);
+            else if (visibleIndex === 4) showPlaidStep('plaid-step-accounts', 'Select accounts', true);
+        }
+
+        function selectPlaidBank(bank) {
+            plaidSelectedBank = bank;
+            document.getElementById('plaid-login-bank').innerText = bank;
+            document.getElementById('plaid-consent-bank').innerText = bank;
+            showPlaidStep('plaid-step-login', `Log in to ${bank}`, true);
+        }
+
+        function togglePlaidPassword() {
+            const pwd = document.getElementById('plaid-password');
+            if (pwd.type === 'password') pwd.type = 'text';
+            else pwd.type = 'password';
+        }
+
+        function submitPlaidLogin() {
+            const user = document.getElementById('plaid-username').value;
+            const pass = document.getElementById('plaid-password').value;
+            if (!user || !pass) {
+                document.getElementById('plaid-login-error').style.display = 'block';
+                return;
+            }
+            document.getElementById('plaid-login-error').style.display = 'none';
+            showPlaidStep('plaid-step-mfa', 'Verify your identity', true);
+        }
+
+        function submitPlaidMfa() {
+            const code = document.getElementById('plaid-mfa-code').value;
+            if (code.length < 4) {
+                document.getElementById('plaid-mfa-error').style.display = 'block';
+                return;
+            }
+            document.getElementById('plaid-mfa-error').style.display = 'none';
+            showPlaidStep('plaid-step-accounts', 'Select accounts', true);
+        }
+
+        function submitPlaidAccounts() {
+            const cbs = document.querySelectorAll('.plaid-account-cb');
+            let any = false;
+            cbs.forEach(cb => { if(cb.checked) any = true; });
+            if (!any) return;
+            showPlaidStep('plaid-step-consent', 'Review and confirm', true);
+        }
+
+        async function submitPlaidConsent() {
+            showPlaidStep('plaid-step-success', 'Account connected', false);
+            
+            try {
+                const res = await fetch('/assets/plaid-example.json');
+                const data = await res.json();
+                
+                data.holdings.forEach(h => {
+                    const sec = data.securities.find(s => s.security_id === h.security_id);
+                    if (sec && h.institution_value > 0) {
+                        addOrUpdateAsset(sec.ticker_symbol, h.institution_value);
+                    }
+                });
+            } catch(e) {
+                console.error("Error loading Plaid data.", e);
+            }
+        }
+        
+        function finishPlaidSuccess() {
+            renderPortfolio();
+            closeAllModals();
+        }
+
+        function addOrUpdateAsset(ticker, value) {
+            const existing = portfolio.find(a => a.ticker === ticker);
+            if (existing) {
+                existing.value += value;
+            } else {
+                portfolio.push({ ticker, value });
+            }
+        }
+
+        function addManualAsset() {
+            const ticker = document.getElementById('manual-ticker').value.toUpperCase();
+            const qty = parseFloat(document.getElementById('manual-quantity').value);
+            const price = parseFloat(document.getElementById('manual-price').value);
+            
+            if (ticker && qty > 0 && price >= 0) {
+                addOrUpdateAsset(ticker, qty * price);
+                renderPortfolio();
+                closeAllModals();
+                document.getElementById('manual-ticker').value = '';
+                document.getElementById('manual-quantity').value = '';
+                document.getElementById('manual-price').value = '';
+            } else {
+                alert("Please fill in valid data.");
+            }
+        }
+
+        function processCsv() {
+            const fileInput = document.getElementById('csv-file');
+            const format = document.getElementById('csv-institution').value;
+            
+            if (!fileInput.files.length) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n').filter(l => l.trim() !== '');
+                if (lines.length < 2) return;
+                
+                for(let i = 1; i < lines.length; i++) {
+                    const row = parseCsvRow(lines[i]);
+                    if (!row || row.length === 0) continue;
+                    
+                    let ticker = '';
+                    let value = 0;
+
+                    try {
+                        if (format === 'gs') {
+                            ticker = row[3];
+                            value = parseFloat(row[7]);
+                        } else if (format === 'jpmc') {
+                            ticker = row[3];
+                            value = parseFloat(row[9]);
+                        } else if (format === 'schwab') {
+                            ticker = row[2];
+                            value = parseFloat(row[7]);
+                        }
+
+                        if (ticker && !isNaN(value) && value > 0 && ticker !== 'CASH') {
+                            addOrUpdateAsset(ticker, value);
+                        } else if (ticker === 'CASH') {
+                            addOrUpdateAsset('CASH', value);
+                        }
+                    } catch (err) {
+                        console.error("Error parsing row", row, err);
+                    }
+                }
+                
+                renderPortfolio();
+                closeAllModals();
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function parseCsvRow(text) {
+            let row = [''], inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                if (c === '"') {
+                    inQuotes = !inQuotes;
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            return row.map(cell => cell.trim());
+        }
 
         function escapeHtml(value) {
             return String(value ?? '')
@@ -399,5 +930,15 @@
             }
         });
     </script>
+
+<footer class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
+<div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
+<div class="flex gap-8">
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Terms</a>
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Privacy</a>
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle Guide</a>
+</div>
+<div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
+</footer>
 </body>
 </html>

@@ -1,96 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Twin | Aura Finance</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .twin-container {
-            display: flex;
-            gap: 2rem;
-            margin-top: 2rem;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            "colors": {
+                "surface": "#f9f9ff",
+                "on-surface": "#191c22",
+                "primary": "#0052ac",
+                "primary-container": "#196ad4",
+                "on-primary-container": "#ecf0ff",
+                "background": "#f9f9ff",
+                "on-background": "#191c22",
+                "surface-container": "#ecedf7",
+            },
+            "borderRadius": {
+                "DEFAULT": "0px",
+                "lg": "0px",
+                "xl": "0px",
+                "full": "0px"
+            },
+            "spacing": {
+                "xl": "64px",
+                "base": "8px",
+                "md": "24px",
+                "gutter": "24px",
+                "lg": "48px",
+                "margin": "32px",
+                "sm": "12px",
+                "xs": "4px"
+            },
+            "fontFamily": {
+                "label-sm": ["Work Sans", "sans-serif"],
+                "body-md": ["Work Sans", "sans-serif"],
+                "body-lg": ["Work Sans", "sans-serif"],
+                "headline-md": ["Epilogue", "sans-serif"],
+                "headline-lg": ["Epilogue", "sans-serif"],
+                "headline-xl": ["Epilogue", "sans-serif"],
+                "label-bold": ["Work Sans", "sans-serif"]
+            },
+            "fontSize": {
+                "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
         }
-        .twin-card {
-            flex: 1;
-            text-align: center;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-        .chart-bar-container {
-            height: 250px;
-            width: 60px;
-            background: #f1f5f9;
-            margin: 2rem auto;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        .chart-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--brand-blue);
-            transition: height 0.3s ease;
-        }
-        .slider-container {
-            margin-top: 3rem;
-            text-align: center;
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        input[type=range] {
-            width: 100%;
-            margin: 1rem 0;
-            accent-color: var(--brand-blue);
-        }
-    </style>
+    }
+}
+</script>
+<style>
+    body { font-family: 'Work Sans', sans-serif; background-color: #f9f9ff; color: #191c22; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Epilogue', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .neobrutalist-card {
+        border: 3px solid black;
+        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        transition: all 0.1s ease;
+        background-color: white;
+        border-radius: 0px;
+    }
+    .neobrutalist-card:active {
+        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        transform: translate(8px, 8px);
+    }
+    .neobrutalist-btn {
+        border: 4px solid black;
+        box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        transition: all 0.1s ease;
+        background-color: #196ad4;
+        color: white;
+        font-family: 'Epilogue', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 0px;
+    }
+    .neobrutalist-btn:active {
+        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        transform: translate(4px, 4px);
+    }
+    .sketch-border {
+        border: 3px solid black;
+        position: relative;
+    }
+    .sketch-border::after {
+        content: '';
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        border: 1px solid black;
+        pointer-events: none;
+        opacity: 0.2;
+    }
+    .floating-voice {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        z-index: 100;
+    }
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 1000;
+        display: none; justify-content: center; align-items: center;
+    }
+    .modal-content {
+        border: 4px solid black;
+        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        background: white;
+        border-radius: 0;
+        padding: 2rem;
+        max-width: 500px;
+        width: 100%;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem; cursor: pointer;
+    }
+</style>
+<title>Moore Money</title>
 </head>
-<body>
-    <nav>
-        <div class="logo">Aura Finance</div>
-        <div class="links">
-            <a href="/dashboard">Portfolio</a>
-            <a href="/canvas">Goals Canvas</a>
-            <a href="/twin" class="active">Financial Twin</a>
-            <a href="/" style="margin-left: 2rem; color: #ef4444;">Logout</a>
-        </div>
-    </nav>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <header class="bg-stone-50 border-b-4 border-black w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+<div class="text-2xl font-black text-black italic font-['Epilogue'] tracking-tighter uppercase">MOORE MONEY</div>
+<nav class="hidden md:flex gap-8">
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/dashboard">Portfolio</a>
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/canvas">Goals Canvas</a>
+<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/twin">Financial Twin</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="neobrutalist-btn px-6 py-2">Join Herd</button>
+<img alt="Mascot Profile" src="./cowIcons/peekingCow.png" class="w-10 h-10 border-2 border-black object-cover" />
+</div>
+</header>
 
-    <main>
-        <h1 style="text-align: center;">Your Financial Twin</h1>
-        <p style="text-align: center; max-width: 600px; margin: 0 auto;">Slide the timeline to see how small rebalancing changes today compound over the years. See the gap between acting now versus staying the course.</p>
+    <main class="max-w-7xl mx-auto px-4 pt-12 pb-12">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <img src="./cowIcons/GrowthCow.png" class="w-24 h-24 mx-auto object-contain" />
+            <h1 class="text-headline-xl font-headline-xl mt-4">Your Financial Twin</h1>
+            <p style="max-width: 600px; margin: 0 auto;" class="mt-2 text-body-lg">Slide the timeline to see how small rebalancing changes today compound over the years. See the gap between acting now versus staying the course.</p>
+        </div>
         
-        <div class="twin-container">
-            <div class="card twin-card">
-                <div class="avatar">😐</div>
-                <h3>Current You</h3>
+        <div class="twin-container" style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
+            <div class="neobrutalist-card twin-card p-4" style="flex: 1; text-align: center;">
+                <img src="./cowIcons/sadCow.png" class="w-20 h-20 mx-auto object-contain" />
+                <h3 class="text-headline-md font-headline-md mt-2">Current You</h3>
                 <p>Status Quo Portfolio (5% APY)</p>
-                <h2 id="current-val" style="margin-top: 1rem;">$10,000</h2>
+                <h2 id="current-val" class="text-headline-lg font-headline-lg" style="margin-top: 1rem;">$10,000</h2>
             </div>
             
-            <div class="card twin-card" style="border: 2px solid var(--brand-blue);">
-                <div class="avatar">😎</div>
-                <h3 style="color: var(--brand-blue);">Rebalanced You</h3>
+            <div class="neobrutalist-card twin-card p-4" style="flex: 1; text-align: center; border: 4px solid #196ad4;">
+                <img src="./cowIcons/defaultCow.png" class="w-20 h-20 mx-auto object-contain" />
+                <h3 class="text-headline-md font-headline-md mt-2" style="color: #196ad4;">Rebalanced You</h3>
                 <p>Optimized Aura Path (8% APY)</p>
-                <h2 id="rebalanced-val" style="color: var(--brand-blue); margin-top: 1rem;">$10,000</h2>
+                <h2 id="rebalanced-val" class="text-headline-lg font-headline-lg" style="color: #196ad4; margin-top: 1rem;">$10,000</h2>
             </div>
         </div>
 
-        <div class="card" style="margin-top: 2rem;">
+        <div class="neobrutalist-card p-4" style="margin-top: 2rem;">
             <div style="height: 350px;">
                 <canvas id="growthChart"></canvas>
             </div>
@@ -189,5 +266,15 @@
 
         slider.addEventListener('input', updateTwin);
     </script>
+
+<footer class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
+<div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
+<div class="flex gap-8">
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Terms</a>
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Privacy</a>
+<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle Guide</a>
+</div>
+<div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
+</footer>
 </body>
 </html>
