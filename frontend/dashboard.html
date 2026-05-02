@@ -33,6 +33,108 @@
         .tag.risk-high { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
         .tag.risk-med { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
         .tag.risk-low { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+        .scan-toolbar {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .scan-toolbar label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .scan-toolbar input {
+            min-width: 140px;
+            margin-bottom: 0;
+            text-transform: uppercase;
+        }
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .summary-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .summary-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .summary-badge.source {
+            background: #e0f2fe;
+            color: #075985;
+        }
+        .summary-badge.risk-high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .summary-badge.risk-med {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .summary-badge.risk-low {
+            background: #d1fae5;
+            color: #047857;
+        }
+        .inline-message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            border: 1px solid transparent;
+        }
+        .inline-message.warning {
+            background: #fff7ed;
+            border-color: #fdba74;
+            color: #9a3412;
+        }
+        .inline-message.error {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+        }
+        .item-stack {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .risk-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            background: #ffffff;
+        }
+        .risk-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.35rem;
+        }
+        .risk-item-header strong {
+            color: var(--text-main);
+        }
+        .empty-state {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .risk-list {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -49,7 +151,13 @@
     <main>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <h1>Portfolio Dashboard</h1>
-            <button class="btn" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+            <div class="scan-toolbar">
+                <label for="ecosystem-ticker">
+                    Ticker
+                    <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL">
+                </label>
+                <button class="btn" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+            </div>
         </div>
 
         <div class="dashboard-grid">
@@ -72,15 +180,31 @@
             </div>
 
             <div class="card" id="exposure-panel">
-                <h3>Risk & Ecosystem Analysis</h3>
-                <p style="color: var(--text-muted); margin-bottom: 1rem;">Click 'Scan' to map your portfolio's supply chain dependencies and competitor threats using Aura's risk engine.</p>
+                <h3>Supply Chain & Competitor Risk</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
                 
-                <div id="exposure-content" style="display: none;">
+                <div id="exposure-error" class="inline-message error" style="display: none;"></div>
+                <div id="exposure-warning" class="inline-message warning" style="display: none;"></div>
+
+                <div id="exposure-content">
+                    <div class="exposure-section">
+                        <div class="summary-header">
+                            <div>
+                                <h4 style="color: var(--brand-blue); margin-bottom: 0.25rem;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
+                                <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
+                            </div>
+                            <div class="summary-badges">
+                                <span id="source-badge" class="summary-badge source">No data</span>
+                            </div>
+                        </div>
+                        <p id="meta-copy" style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">This scan is directional. It is not verified supplier data.</p>
+                    </div>
+
                     <div class="exposure-section">
                         <h4 style="color: var(--brand-blue); display: flex; align-items: center; gap: 0.5rem;">
                             <span style="font-size: 1.25rem;">🔗</span> Supply Chain Dependency
                         </h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Your AAPL holdings expose you to these primary suppliers. A shock to any of these affects your portfolio.</p>
+                        <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top supplier dependencies or input categories that may matter for this business.</p>
                         <div id="suppliers-list"></div>
                     </div>
 
@@ -88,7 +212,7 @@
                         <h4 style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
                             <span style="font-size: 1.25rem;">⚔️</span> Competitor Ecosystem Risk
                         </h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Market share threats to your current tech holdings.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top competitor names that may pressure market share or ecosystem positioning.</p>
                         <div id="competitors-list"></div>
                     </div>
                 </div>
@@ -120,25 +244,160 @@
             }
         });
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        function riskClass(level) {
+            if (level === 'High') return 'risk-high';
+            if (level === 'Medium') return 'risk-med';
+            return 'risk-low';
+        }
+
+        function sourceLabel(source) {
+            if (source === 'gemini_ai_estimate') return 'AI-estimated';
+            if (source === 'fallback') return 'Fallback estimate';
+            return 'No data';
+        }
+
+        function renderRelationshipItems(target, items, emptyMessage) {
+            if (!items.length) {
+                target.innerHTML = `<p class="empty-state">${emptyMessage}</p>`;
+                return;
+            }
+
+            target.innerHTML = `
+                <div class="item-stack">
+                    ${items.map(item => `
+                        <div class="risk-item">
+                            <div class="risk-item-header">
+                                <div>
+                                    <strong>${escapeHtml(item.symbol || item.name || 'Unknown')}</strong>
+                                    <p style="font-size: 0.85rem;">${escapeHtml(item.name !== item.symbol && item.symbol ? item.name : item.category || item.relationship || '')}</p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                                    ${item.weight != null ? `<span class="tag">${Math.round(Number(item.weight) * 100)}% weight</span>` : ''}
+                                    ${item.confidence != null ? `<span class="tag">${Math.round(Number(item.confidence) * 100)}% confidence</span>` : ''}
+                                </div>
+                            </div>
+                            <p style="font-size: 0.88rem;">${escapeHtml(item.reason || 'AI-estimated relationship for this ticker.')}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         async function fetchExposureData() {
-            const content = document.getElementById('exposure-content');
+            const tickerInput = document.getElementById('ecosystem-ticker');
+            const scanButton = document.getElementById('scan-button');
+            const errorBanner = document.getElementById('exposure-error');
+            const warningBanner = document.getElementById('exposure-warning');
             const suppliersList = document.getElementById('suppliers-list');
             const competitorsList = document.getElementById('competitors-list');
-            
-            content.style.display = 'block';
-            suppliersList.innerHTML = '<p>Loading...</p>';
-            
+            const summaryTicker = document.getElementById('summary-ticker');
+            const summaryExplanation = document.getElementById('summary-explanation');
+            const sourceBadge = document.getElementById('source-badge');
+            const metaCopy = document.getElementById('meta-copy');
+            const normalizedTicker = tickerInput.value.trim().toUpperCase();
+            const isValidTicker = /^[A-Z0-9.-]{1,12}$/.test(normalizedTicker);
+
+            tickerInput.value = normalizedTicker;
+            errorBanner.style.display = 'none';
+            warningBanner.style.display = 'none';
+            warningBanner.innerHTML = '';
+
+            if (!normalizedTicker) {
+                errorBanner.textContent = 'Enter a ticker before scanning.';
+                errorBanner.style.display = 'block';
+                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                return;
+            }
+
+            if (!isValidTicker) {
+                errorBanner.textContent = 'Ticker must use letters, numbers, dots, or hyphens only.';
+                errorBanner.style.display = 'block';
+                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                return;
+            }
+
+            suppliersList.innerHTML = '<p class="empty-state">Loading supply-chain relationships...</p>';
+            competitorsList.innerHTML = '<p class="empty-state">Loading peer companies...</p>';
+            summaryTicker.textContent = normalizedTicker || 'Ticker';
+            summaryExplanation.textContent = 'Building an AI-estimated relationship map...';
+            sourceBadge.textContent = 'Loading';
+            metaCopy.textContent = 'This scan is directional. It is not verified supplier data.';
+            scanButton.disabled = true;
+            scanButton.textContent = 'Scanning...';
+
             try {
-                const res = await fetch('/api/portfolio');
-                const json = await res.json();
-                const data = json.data.apple;
-                
-                suppliersList.innerHTML = data.suppliers.map(s => `<span class="tag risk-med">${s} (22% linked)</span>`).join('');
-                competitorsList.innerHTML = data.competitors.map(c => `<span class="tag risk-high">${c}</span>`).join('');
-            } catch(e) {
-                suppliersList.innerHTML = '<p>Error fetching data.</p>';
+                const res = await fetch(`/api/supply-chain/${encodeURIComponent(normalizedTicker)}`);
+                const payload = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(payload.error || 'Unable to fetch ecosystem risk data.');
+                }
+
+                const topSuppliers = (payload.suppliers || []).slice(0, 3);
+                const topCompetitors = (payload.competitors || []).slice(0, 3);
+
+                summaryTicker.textContent = payload.companyName || payload.symbol || normalizedTicker;
+                summaryExplanation.textContent = payload.source === 'gemini_ai_estimate'
+                    ? 'AI-estimated supplier and competitor map based on public company knowledge.'
+                    : 'Fallback estimate shown because live AI output was unavailable.';
+                sourceBadge.textContent = sourceLabel(payload.source);
+                metaCopy.textContent = payload.source === 'empty'
+                    ? 'No directional map is available for this ticker yet.'
+                    : 'This scan is directional. It is not verified supplier data.';
+
+                renderRelationshipItems(
+                    suppliersList,
+                    topSuppliers,
+                    'No supply-chain relationships found for this ticker yet.'
+                );
+                renderRelationshipItems(
+                    competitorsList,
+                    topCompetitors,
+                    'No peer companies found for this ticker yet.'
+                );
+
+                const warnings = [];
+                if (payload.source === 'gemini_ai_estimate') {
+                    warnings.push('This map is AI-estimated and should be treated as directional, not verified supplier data.');
+                }
+                (payload.warnings || []).forEach(item => warnings.push(item));
+                if (warnings.length) {
+                    warningBanner.innerHTML = [...new Set(warnings)]
+                        .map(item => `<div>${escapeHtml(item)}</div>`)
+                        .join('');
+                    warningBanner.style.display = 'block';
+                }
+            } catch (error) {
+                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                summaryExplanation.textContent = 'We could not load the relationship map for that ticker.';
+                sourceBadge.textContent = 'No data';
+                metaCopy.textContent = 'Try another ticker or check your Gemini API configuration.';
+                errorBanner.textContent = error.message;
+                errorBanner.style.display = 'block';
+            } finally {
+                scanButton.disabled = false;
+                scanButton.textContent = 'Scan for Hidden Exposure';
             }
         }
+
+        document.getElementById('ecosystem-ticker').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                fetchExposureData();
+            }
+        });
     </script>
 </body>
 </html>

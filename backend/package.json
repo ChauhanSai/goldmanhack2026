@@ -1,0 +1,13 @@
+{
+  "name": "aura-finance-backend-tools",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:gemini": "node scripts/runGeminiSupplyChain.js AAPL"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.7.9",
+    "dotenv": "^17.4.2"
+  }
+}
