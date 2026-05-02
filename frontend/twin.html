@@ -469,10 +469,9 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const queryVal = urlParams.get('value');
-        let baseAmount = getPortfolioTotal(dashboardPortfolio);
-        if (!baseAmount) {
-            baseAmount = queryVal && !isNaN(parseFloat(queryVal)) ? parseFloat(queryVal) : 10000;
-        }
+        let baseAmount = queryVal && !isNaN(parseFloat(queryVal)) 
+            ? parseFloat(queryVal) 
+            : getPortfolioTotal(dashboardPortfolio) || 10000;
 
         // Initialize Data
         const labels = Array.from({ length: 31 }, (_, i) => 2026 + i);
@@ -480,9 +479,36 @@
         let rebalancedData = labels.map((_, i) => baseAmount * Math.pow(rebalancedRate, i));
         let activeScenario = null;
 
+        const verticalLinePlugin = {
+            id: 'verticalLine',
+            afterDraw: (chart) => {
+                const years = parseInt(slider.value);
+                const meta = chart.getDatasetMeta(0);
+                const point = meta.data[years];
+                
+                if (point) {
+                    const ctx = chart.ctx;
+                    const x = point.x;
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+                    
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#196ad4';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
         const ctx = document.getElementById('growthChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
+            plugins: [verticalLinePlugin],
             data: {
                 labels: labels,
                 datasets: [
@@ -725,6 +751,7 @@
         function updateTwin() {
             const years = parseInt(slider.value);
             setSliderVisuals();
+            if (typeof chart !== 'undefined') chart.update('none');
             yearDisplay.innerText = 2026 + years;
 
             const curAmount = currentData[years];
@@ -733,7 +760,6 @@
             currentVal.innerText = '$' + curAmount.toLocaleString(undefined, { maximumFractionDigits: 0 });
             rebalancedVal.innerText = '$' + rebAmount.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-            const diff = rebAmount - curAmount;
             const diffEl = document.getElementById("coach-difference");
 
             if (diffEl) {
@@ -742,12 +768,20 @@
                     return;
                 }
 
-                if (diff >= 0) {
+                let displayYear = 2026 + years;
+                let displayDiff = rebAmount - curAmount;
+                
+                if (years === 0) {
+                    displayYear = 2056;
+                    displayDiff = rebalancedData[30] - currentData[30];
+                }
+
+                if (displayDiff >= 0) {
                     diffEl.innerText =
-                        `By ${2026 + years}, rebalancing is projected to be $${diff.toLocaleString(undefined, { maximumFractionDigits: 0 })} ahead of doing nothing.`;
+                        `By ${displayYear}, rebalancing is projected to be $${displayDiff.toLocaleString(undefined, { maximumFractionDigits: 0 })} ahead of doing nothing.`;
                 } else {
                     diffEl.innerText =
-                        `By ${2026 + years}, the safer rebalance trails by $${Math.abs(diff).toLocaleString(undefined, { maximumFractionDigits: 0 })}, but may reduce downside risk.`;
+                        `By ${displayYear}, the safer rebalance trails by $${Math.abs(displayDiff).toLocaleString(undefined, { maximumFractionDigits: 0 })}, but may reduce downside risk.`;
                 }
             }
         }
