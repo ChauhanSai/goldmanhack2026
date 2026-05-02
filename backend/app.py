@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import os
 import json
 import praw
+import random
+import networkx as nx
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from datetime import datetime, timedelta
 import json
@@ -184,6 +186,69 @@ def bot_sentiment():
         "recommendation": rec,
         "confidence": conf,
         "sentiment": msg
+    })
+
+@app.route('/api/portfolio/frm_metrics', methods=['POST'])
+def portfolio_frm_metrics():
+    data = request.json
+    portfolio = data.get('portfolio', [])
+    
+    if not portfolio:
+        return jsonify({"status": "error", "message": "No portfolio data provided"}), 400
+        
+    tickers = [item.get('ticker') for item in portfolio]
+    num_assets = len(tickers)
+    
+    # 1. Simulate FRM Lambda (Individual risk penalties)
+    # The paper uses GACV Lasso quantile regression, but we mock it here.
+    lambdas = {ticker: round(random.uniform(0.01, 0.15), 4) for ticker in tickers}
+    frm_index = sum(lambdas.values()) / num_assets if num_assets > 0 else 0
+    
+    # 2. Simulate Adjacency Matrix (Spillover effects/Betas)
+    G = nx.DiGraph()
+    for ticker in tickers:
+        G.add_node(ticker)
+        
+    for i, t1 in enumerate(tickers):
+        for j, t2 in enumerate(tickers):
+            if i != j:
+                # Add an edge with some probability to simulate a sparse network
+                if random.random() > 0.3:  
+                    weight = round(random.uniform(0.01, 0.8), 4)
+                    G.add_edge(t1, t2, weight=weight)
+                    
+    # 3. Calculate Centrality Metrics
+    try:
+        eigenvector = nx.eigenvector_centrality(G, weight='weight', max_iter=1000)
+    except nx.PowerIterationFailedConvergence:
+        eigenvector = {t: 0 for t in tickers}
+        
+    betweenness = nx.betweenness_centrality(G, weight='weight')
+    closeness = nx.closeness_centrality(G, distance='weight')
+    in_degree = dict(G.in_degree(weight='weight'))
+    out_degree = dict(G.out_degree(weight='weight'))
+    
+    # Optional: upHRP Weights simulation (Inverse lambda allocation)
+    total_inv_lambda = sum(1.0 / l for l in lambdas.values())
+    uphrp_weights = {t: round((1.0 / lambdas[t]) / total_inv_lambda, 4) for t in tickers}
+    
+    # Assemble response
+    metrics = {}
+    for ticker in tickers:
+        metrics[ticker] = {
+            "lambda_risk": lambdas[ticker],
+            "in_degree": round(in_degree.get(ticker, 0), 4),
+            "out_degree": round(out_degree.get(ticker, 0), 4),
+            "eigenvector_centrality": round(eigenvector.get(ticker, 0), 4),
+            "betweenness_centrality": round(betweenness.get(ticker, 0), 4),
+            "closeness_centrality": round(closeness.get(ticker, 0), 4),
+            "upHRP_weight": uphrp_weights[ticker]
+        }
+        
+    return jsonify({
+        "status": "success",
+        "frm_index": round(frm_index, 4),
+        "metrics": metrics
     })
 
 if __name__ == '__main__':
