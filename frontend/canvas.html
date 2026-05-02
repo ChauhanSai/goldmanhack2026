@@ -1,201 +1,432 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-    darkMode: "class",
-    theme: {
-        extend: {
-            "colors": {
-                "surface": "#f9f9ff",
-                "on-surface": "#191c22",
-                "primary": "#0052ac",
-                "primary-container": "#196ad4",
-                "on-primary-container": "#ecf0ff",
-                "background": "#f9f9ff",
-                "on-background": "#191c22",
-                "surface-container": "#ecedf7",
-            },
-            "borderRadius": {
-                "DEFAULT": "0px",
-                "lg": "0px",
-                "xl": "0px",
-                "full": "0px"
-            },
-            "spacing": {
-                "xl": "64px",
-                "base": "8px",
-                "md": "24px",
-                "gutter": "24px",
-                "lg": "48px",
-                "margin": "32px",
-                "sm": "12px",
-                "xs": "4px"
-            },
-            "fontFamily": {
-                "label-sm": ["Work Sans", "sans-serif"],
-                "body-md": ["Work Sans", "sans-serif"],
-                "body-lg": ["Work Sans", "sans-serif"],
-                "headline-md": ["Epilogue", "sans-serif"],
-                "headline-lg": ["Epilogue", "sans-serif"],
-                "headline-xl": ["Epilogue", "sans-serif"],
-                "label-bold": ["Work Sans", "sans-serif"]
-            },
-            "fontSize": {
-                "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
-                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
-                "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
-                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
-                "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900"}],
-                "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "700"}]
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9ff",
+                        "on-surface": "#191c22",
+                        "primary": "#0052ac",
+                        "primary-container": "#196ad4",
+                        "on-primary-container": "#ecf0ff",
+                        "background": "#f9f9ff",
+                        "on-background": "#191c22",
+                        "surface-container": "#ecedf7",
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "base": "8px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "lg": "48px",
+                        "margin": "32px",
+                        "sm": "12px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Work Sans", "sans-serif"],
+                        "body-md": ["Work Sans", "sans-serif"],
+                        "body-lg": ["Work Sans", "sans-serif"],
+                        "headline-md": ["Epilogue", "sans-serif"],
+                        "headline-lg": ["Epilogue", "sans-serif"],
+                        "headline-xl": ["Epilogue", "sans-serif"],
+                        "label-bold": ["Work Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "label-bold": ["14px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
             }
         }
-    }
-}
-</script>
-<style>
-    body { font-family: 'Work Sans', sans-serif; background-color: #f9f9ff; color: #191c22; }
-    h1, h2, h3, h4, h5, h6 { font-family: 'Epilogue', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    .neobrutalist-card {
-        border: 3px solid black;
-        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-        transition: all 0.1s ease;
-        background-color: white;
-        border-radius: 0px;
-    }
-    .neobrutalist-card:active {
-        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
-        transform: translate(8px, 8px);
-    }
-    .neobrutalist-btn {
-        border: 4px solid black;
-        box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
-        transition: all 0.1s ease;
-        background-color: #196ad4;
-        color: white;
-        font-family: 'Epilogue', sans-serif;
-        font-weight: 900;
-        text-transform: uppercase;
-        cursor: pointer;
-        border-radius: 0px;
-    }
-    .neobrutalist-btn:active {
-        box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
-        transform: translate(4px, 4px);
-    }
-    .sketch-border {
-        border: 3px solid black;
-        position: relative;
-    }
-    .sketch-border::after {
-        content: '';
-        position: absolute;
-        top: -2px; left: -2px; right: -2px; bottom: -2px;
-        border: 1px solid black;
-        pointer-events: none;
-        opacity: 0.2;
-    }
-    .floating-voice {
-        position: fixed;
-        bottom: 32px;
-        right: 32px;
-        z-index: 100;
-    }
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); z-index: 1000;
-        display: none; justify-content: center; align-items: center;
-    }
-    .modal-content {
-        border: 4px solid black;
-        box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-        background: white;
-        border-radius: 0;
-        padding: 2rem;
-        max-width: 500px;
-        width: 100%;
-        position: relative;
-    }
-    .modal-close {
-        position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem; cursor: pointer;
-    }
-</style>
-<title>Moore Money</title>
+    </script>
+    <style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f9f9ff;
+            color: #191c22;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Epilogue', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .neobrutalist-card {
+            border: 3px solid black;
+            box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+            transition: box-shadow 0.1s ease, transform 0.1s ease;
+            background-color: white;
+            border-radius: 0px;
+        }
+
+        .neobrutalist-btn {
+            border: 4px solid black;
+            box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+            transition: all 0.1s ease;
+            background-color: #196ad4;
+            color: white;
+            font-family: 'Epilogue', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 0px;
+        }
+
+        .neobrutalist-btn:active {
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+            transform: translate(4px, 4px);
+        }
+
+        .neobrutalist-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── Prompt bar ── */
+        .prompt-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            align-items: stretch;
+        }
+
+        .prompt-bar input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 3px solid black;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            border-radius: 0;
+            background: white;
+        }
+
+        .prompt-bar input:focus {
+            border-color: #196ad4;
+            box-shadow: 4px 4px 0 #196ad4;
+        }
+
+        /* ── Canvas container ── */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            background-color: #fafafa;
+            background-image:
+                linear-gradient(#e5e7eb 1px, transparent 1px),
+                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 32px 32px;
+            cursor: default;
+        }
+
+        /* SVG overlay for edges — must fill the canvas exactly */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Nodes ── */
+        .node {
+            position: absolute;
+            min-width: 140px;
+            max-width: 200px;
+            padding: 0.6rem 1rem;
+            background: white;
+            border: 3px solid black;
+            box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+            font-family: 'Epilogue', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            cursor: grab;
+            user-select: none;
+            z-index: 10;
+            text-align: center;
+            border-radius: 0;
+            transition: box-shadow 0.08s ease, transform 0.08s ease;
+            word-break: break-word;
+        }
+
+        .node:hover {
+            box-shadow: 7px 7px 0px 0px rgba(0, 0, 0, 1);
+            transform: translate(-1px, -1px);
+        }
+
+        .node.dragging {
+            cursor: grabbing;
+            box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+            transform: translate(3px, 3px);
+            z-index: 100;
+        }
+
+        /* Alternate node accent colors */
+        .node:nth-child(3n+1) {
+            border-top: 6px solid #196ad4;
+        }
+
+        .node:nth-child(3n+2) {
+            border-top: 6px solid #f59e0b;
+        }
+
+        .node:nth-child(3n+3) {
+            border-top: 6px solid #10b981;
+        }
+
+        /* ── Loading overlay ── */
+        #canvas-loading {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(249, 249, 255, 0.85);
+            z-index: 200;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #191c22;
+            border-top-color: #196ad4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Empty state ── */
+        #canvas-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            border: 4px solid black;
+            box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+            background: white;
+            border-radius: 0;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+    <title>Moore Money</title>
 </head>
+
 <body class="bg-background text-on-background font-body-md overflow-x-hidden">
-    <header class="bg-stone-50 border-b-4 border-black w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
-<div class="text-2xl font-black text-black italic font-['Epilogue'] tracking-tighter uppercase">MOORE MONEY</div>
-<nav class="hidden md:flex gap-8">
-<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/dashboard">Portfolio</a>
-<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/canvas">Goals Canvas</a>
-<a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1" href="/twin">Financial Twin</a>
-</nav>
-<div class="flex items-center gap-4">
-<button class="neobrutalist-btn px-6 py-2">Join Herd</button>
-<img alt="Mascot Profile" src="./cowIcons/peekingCow.png" class="w-10 h-10 border-2 border-black object-cover" />
-</div>
-</header>
+    <header
+        class="bg-stone-50 border-b-4 border-black w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+        <div class="text-2xl font-black text-black italic font-['Epilogue'] tracking-tighter uppercase">MOORE MONEY
+        </div>
+        <nav class="hidden md:flex gap-8">
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/dashboard">Portfolio</a>
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/canvas">Goals Canvas</a>
+            <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
+                href="/twin">Financial Twin</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button class="neobrutalist-btn px-6 py-2" onclick="window.location.href='/'">Sign Out</button>
+        </div>
+    </header>
 
     <main class="max-w-7xl mx-auto px-4 pt-12 pb-12">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-            <img src="./cowIcons/ReachingGoalsCow.png" class="w-20 h-20 object-contain" />
             <div>
                 <h1 class="text-headline-xl font-headline-xl">Goal Canvas</h1>
-                <p class="text-body-lg">Visually map your financial journey. Drag nodes, or ask AI to rebalance your timeline.</p>
+                <p class="text-body-lg">Visually map your financial journey. Drag nodes, or ask AI to rebalance your
+                    timeline.</p>
             </div>
         </div>
-        
+
         <div class="prompt-bar">
             <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
-            <button class="neobrutalist-btn px-4 py-2" onclick="generateNodesFromPrompt()">Generate Path</button>
+            <button class="neobrutalist-btn px-4 py-2" onclick="generateNodesFromPrompt()">
+                Generate Path
+            </button>
         </div>
 
         <div class="neobrutalist-card canvas-container" id="canvas-area">
             <svg class="connections" id="svg-layer"></svg>
-            <!-- Nodes will be appended here -->
+
+            <!-- Empty state -->
+            <div id="canvas-empty">
+                <img src="./cowIcons/ReachingGoalsCow.png"
+                    style="width:80px;height:80px;object-fit:contain;opacity:0.4;" />
+                <p style="font-family:'Epilogue',sans-serif;font-weight:800;font-size:1rem;color:#94a3b8;">
+                    Type a goal above &amp; hit Generate Path
+                </p>
+            </div>
+
+            <!-- Loading overlay -->
+            <div id="canvas-loading">
+                <div class="spinner"></div>
+                <p style="font-family:'Epilogue',sans-serif;font-weight:800;font-size:1rem;">Generating your path...</p>
+            </div>
         </div>
     </main>
 
     <script src="/js/app.js"></script>
     <script>
-        const canvas = document.getElementById('canvas-area');
+        const canvasEl = document.getElementById('canvas-area');
         const svgLayer = document.getElementById('svg-layer');
+        const emptyEl = document.getElementById('canvas-empty');
+        const loadingEl = document.getElementById('canvas-loading');
+        const generateBtn = document.querySelector('.neobrutalist-btn[onclick="generateNodesFromPrompt()"]');
+
         let nodesData = [];
         let edgesData = [];
+        // Map from edge key → SVG <line> element for in-place updates
+        const edgeLines = {};
+        // Map from node id → {el, data} for in-place updates
+        const nodeEls = {};
+
         let isDragging = false;
-        let dragNode = null;
-        let offsetX, offsetY;
+        let dragNode = null;  // { data, el }
+        let dragOffX, dragOffY;
 
-        function renderCanvas() {
-            // Clear existing
-            Array.from(canvas.querySelectorAll('.node')).forEach(n => n.remove());
-            svgLayer.innerHTML = '';
+        // ── Helpers ──────────────────────────────────────────────────────────
+        function nodeCenter(data) {
+            const el = nodeEls[data.id] && nodeEls[data.id].el;
+            const w = el ? el.offsetWidth : 150;
+            const h = el ? el.offsetHeight : 50;
+            return { cx: data.x + w / 2, cy: data.y + h / 2 };
+        }
 
-            // Draw Edges
+        function updateEdges() {
             edgesData.forEach(edge => {
-                const source = nodesData.find(n => n.id === edge.source);
-                const target = nodesData.find(n => n.id === edge.target);
-                if (source && target) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', source.x + 75);
-                    line.setAttribute('y1', source.y + 25);
-                    line.setAttribute('x2', target.x + 75);
-                    line.setAttribute('y2', target.y + 25);
-                    line.setAttribute('stroke', '#cbd5e1');
-                    line.setAttribute('stroke-width', '3');
-                    svgLayer.appendChild(line);
+                const src = nodesData.find(n => n.id === edge.source);
+                const tgt = nodesData.find(n => n.id === edge.target);
+                if (!src || !tgt) return;
+                const key = `${edge.source}->${edge.target}`;
+                const sc = nodeCenter(src);
+                const tc = nodeCenter(tgt);
+                if (edgeLines[key]) {
+                    edgeLines[key].setAttribute('x1', sc.cx);
+                    edgeLines[key].setAttribute('y1', sc.cy);
+                    edgeLines[key].setAttribute('x2', tc.cx);
+                    edgeLines[key].setAttribute('y2', tc.cy);
                 }
             });
+        }
 
-            // Draw Nodes
+        // ── Full render (called once after data loads) ────────────────────────
+        function renderCanvas() {
+            // Clear previous
+            canvasEl.querySelectorAll('.node').forEach(n => n.remove());
+            svgLayer.innerHTML = '';
+            Object.keys(edgeLines).forEach(k => delete edgeLines[k]);
+            Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
+
+            if (!nodesData.length) { emptyEl.style.display = 'flex'; return; }
+            emptyEl.style.display = 'none';
+
+            // Draw edges first (they sit behind nodes)
+            edgesData.forEach(edge => {
+                const key = `${edge.source}->${edge.target}`;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('stroke', '#191c22');
+                line.setAttribute('stroke-width', '3');
+                line.setAttribute('stroke-dasharray', '6 4');
+                svgLayer.appendChild(line);
+                edgeLines[key] = line;
+
+                // Arrow marker
+                const defs = svgLayer.querySelector('defs') || svgLayer.insertBefore(
+                    document.createElementNS('http://www.w3.org/2000/svg', 'defs'), svgLayer.firstChild
+                );
+                if (!defs.querySelector('#arrow')) {
+                    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                    marker.setAttribute('id', 'arrow');
+                    marker.setAttribute('markerWidth', '8');
+                    marker.setAttribute('markerHeight', '8');
+                    marker.setAttribute('refX', '6');
+                    marker.setAttribute('refY', '3');
+                    marker.setAttribute('orient', 'auto');
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', 'M0,0 L0,6 L9,3 z');
+                    path.setAttribute('fill', '#191c22');
+                    marker.appendChild(path);
+                    defs.appendChild(marker);
+                }
+                line.setAttribute('marker-end', 'url(#arrow)');
+            });
+
+            // Draw nodes
             nodesData.forEach(node => {
                 const div = document.createElement('div');
                 div.className = 'node';
@@ -203,75 +434,115 @@ tailwind.config = {
                 div.innerText = node.text;
                 div.style.left = node.x + 'px';
                 div.style.top = node.y + 'px';
-                
-                div.addEventListener('mousedown', (e) => {
+
+                div.addEventListener('mousedown', e => {
+                    e.preventDefault();
                     isDragging = true;
-                    dragNode = node;
-                    offsetX = e.clientX - node.x;
-                    offsetY = e.clientY - node.y;
+                    dragNode = { data: node, el: div };
+                    dragOffX = e.clientX - node.x;
+                    dragOffY = e.clientY - node.y;
+                    div.classList.add('dragging');
                 });
-                
-                div.addEventListener('click', () => {
-                    if (!isDragging) {
-                        const editPrompt = prompt(`Edit node: "${node.text}" with AI:`, `What if I want to...`);
-                        if (editPrompt) alert('AI Edit requested: ' + editPrompt + '\\n(Mock implemented for demo)');
-                    }
-                });
-                
-                canvas.appendChild(div);
+
+                canvasEl.appendChild(div);
+                nodeEls[node.id] = { el: div, data: node };
             });
+
+            // Now that nodes are in the DOM we can measure them and place edges
+            requestAnimationFrame(updateEdges);
         }
 
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging && dragNode) {
-                const rect = canvas.getBoundingClientRect();
-                let newX = e.clientX - offsetX;
-                let newY = e.clientY - offsetY;
-                // Boundaries
-                newX = Math.max(0, Math.min(newX, rect.width - 150));
-                newY = Math.max(0, Math.min(newY, rect.height - 50));
-                
-                dragNode.x = newX;
-                dragNode.y = newY;
-                renderCanvas();
-            }
+        // ── Drag ──────────────────────────────────────────────────────────────
+        document.addEventListener('mousemove', e => {
+            if (!isDragging || !dragNode) return;
+            const rect = canvasEl.getBoundingClientRect();
+            let newX = e.clientX - dragOffX;
+            let newY = e.clientY - dragOffY;
+            const nodeW = dragNode.el.offsetWidth;
+            const nodeH = dragNode.el.offsetHeight;
+            newX = Math.max(0, Math.min(newX, rect.width - nodeW));
+            newY = Math.max(0, Math.min(newY, rect.height - nodeH));
+
+            dragNode.data.x = newX;
+            dragNode.data.y = newY;
+            dragNode.el.style.left = newX + 'px';
+            dragNode.el.style.top = newY + 'px';
+            updateEdges();
         });
 
         document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                setTimeout(() => isDragging = false, 50); // slight delay to prevent click fire
-                dragNode = null;
+            if (isDragging && dragNode) {
+                dragNode.el.classList.remove('dragging');
             }
+            isDragging = false;
+            dragNode = null;
         });
 
+        // ── API call ──────────────────────────────────────────────────────────
         async function generateNodesFromPrompt() {
-            const promptStr = document.getElementById('ai-prompt').value;
+            const promptStr = document.getElementById('ai-prompt').value.trim();
             if (!promptStr) return;
-            
+
+            // Show loading
+            loadingEl.style.display = 'flex';
+            emptyEl.style.display = 'none';
+            if (generateBtn) generateBtn.disabled = true;
+
             try {
                 const res = await fetch('/api/canvas/prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: promptStr })
                 });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                nodesData = data.nodes;
-                edgesData = data.edges;
+
+                nodesData = data.nodes || [];
+                edgesData = data.edges || [];
+            } catch (err) {
+                console.error('Canvas API error:', err);
+                // Fallback demo so the user always sees something
+                nodesData = [
+                    { id: 'goal', text: promptStr.slice(0, 30) + (promptStr.length > 30 ? '…' : ''), x: 320, y: 60 },
+                    { id: 'step1', text: 'Define Budget', x: 60, y: 200 },
+                    { id: 'step2', text: 'Build Emergency Fund', x: 260, y: 200 },
+                    { id: 'step3', text: 'Start Investing', x: 480, y: 200 },
+                    { id: 'step4', text: 'Track Progress', x: 320, y: 380 },
+                ];
+                edgesData = [
+                    { source: 'step1', target: 'goal' },
+                    { source: 'step2', target: 'goal' },
+                    { source: 'step3', target: 'goal' },
+                    { source: 'step1', target: 'step4' },
+                    { source: 'step3', target: 'step4' },
+                ];
+            } finally {
+                loadingEl.style.display = 'none';
+                if (generateBtn) generateBtn.disabled = false;
                 renderCanvas();
-            } catch(e) {
-                console.error("Error generating nodes");
             }
         }
+
+        // Allow Enter key to submit
+        document.getElementById('ai-prompt').addEventListener('keydown', e => {
+            if (e.key === 'Enter') generateNodesFromPrompt();
+        });
     </script>
 
-<footer class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
-<div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
-<div class="flex gap-8">
-<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Terms</a>
-<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Privacy</a>
-<a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle Guide</a>
-</div>
-<div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
-</footer>
+    <footer
+        class="bg-stone-100 border-t-4 border-black w-full flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4 mt-12">
+        <div class="font-['Epilogue'] font-black text-lg text-black uppercase italic">MOORE MONEY</div>
+        <div class="flex gap-8">
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
+                href="#">Terms</a>
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2"
+                href="#">Privacy</a>
+            <a class="font-['Epilogue'] font-medium text-sm text-stone-600 hover:underline decoration-2" href="#">Doodle
+                Guide</a>
+        </div>
+        <div class="font-['Epilogue'] font-medium text-sm text-stone-600">© 2026 MOORE MONEY - NO BULL.</div>
+    </footer>
 </body>
+
 </html>
