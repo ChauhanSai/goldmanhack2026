@@ -348,16 +348,49 @@
         const loadingEl = document.getElementById('canvas-loading');
         const generateBtn = document.querySelector('.neobrutalist-btn[onclick="generateNodesFromPrompt()"]');
 
+        // Viewport element to contain everything we want to transform
+        let viewportEl;
+
         let nodesData = [];
         let edgesData = [];
-        // Map from edge key → SVG <line> element for in-place updates
         const edgeLines = {};
-        // Map from node id → {el, data} for in-place updates
         const nodeEls = {};
 
-        let isDragging = false;
-        let dragNode = null;  // { data, el }
+        // Transform State
+        let scale = 1;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        // Interaction State
+        let isDraggingNode = false;
+        let dragNode = null;
         let dragOffX, dragOffY;
+
+        let isPanning = false;
+        let lastMouseX, lastMouseY;
+
+        // Initialize Viewport
+        function initViewport() {
+            viewportEl = document.createElement('div');
+            viewportEl.id = 'canvas-viewport';
+            viewportEl.style.position = 'absolute';
+            viewportEl.style.top = '0';
+            viewportEl.style.left = '0';
+            viewportEl.style.width = '100%';
+            viewportEl.style.height = '100%';
+            viewportEl.style.transformOrigin = '0 0';
+            
+            // Move SVG into viewport
+            canvasEl.insertBefore(viewportEl, svgLayer);
+            viewportEl.appendChild(svgLayer);
+            
+            updateViewportTransform();
+        }
+
+        function updateViewportTransform() {
+            if (!viewportEl) return;
+            viewportEl.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        }
 
         // ── Helpers ──────────────────────────────────────────────────────────
         function nodeCenter(data) {
@@ -386,8 +419,10 @@
 
         // ── Full render (called once after data loads) ────────────────────────
         function renderCanvas() {
-            // Clear previous
-            canvasEl.querySelectorAll('.node').forEach(n => n.remove());
+            if (!viewportEl) initViewport();
+
+            // Clear previous nodes
+            viewportEl.querySelectorAll('.node').forEach(n => n.remove());
             svgLayer.innerHTML = '';
             Object.keys(edgeLines).forEach(k => delete edgeLines[k]);
             Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
@@ -395,7 +430,10 @@
             if (!nodesData.length) { emptyEl.style.display = 'flex'; return; }
             emptyEl.style.display = 'none';
 
-            // Draw edges first (they sit behind nodes)
+            // Reset transform when new data comes in? (optional)
+            // scale = 1; offsetX = 0; offsetY = 0; updateViewportTransform();
+
+            // Draw edges
             edgesData.forEach(edge => {
                 const key = `${edge.source}->${edge.target}`;
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -405,7 +443,6 @@
                 svgLayer.appendChild(line);
                 edgeLines[key] = line;
 
-                // Arrow marker
                 const defs = svgLayer.querySelector('defs') || svgLayer.insertBefore(
                     document.createElementNS('http://www.w3.org/2000/svg', 'defs'), svgLayer.firstChild
                 );
@@ -436,46 +473,98 @@
                 div.style.top = node.y + 'px';
 
                 div.addEventListener('mousedown', e => {
+                    e.stopPropagation(); // Prevent background pan
                     e.preventDefault();
-                    isDragging = true;
+                    isDraggingNode = true;
                     dragNode = { data: node, el: div };
-                    dragOffX = e.clientX - node.x;
-                    dragOffY = e.clientY - node.y;
+                    // We need to account for scale when calculating the offset
+                    dragOffX = (e.clientX / scale) - node.x;
+                    dragOffY = (e.clientY / scale) - node.y;
                     div.classList.add('dragging');
                 });
 
-                canvasEl.appendChild(div);
+                viewportEl.appendChild(div);
                 nodeEls[node.id] = { el: div, data: node };
             });
 
-            // Now that nodes are in the DOM we can measure them and place edges
             requestAnimationFrame(updateEdges);
         }
 
-        // ── Drag ──────────────────────────────────────────────────────────────
-        document.addEventListener('mousemove', e => {
-            if (!isDragging || !dragNode) return;
+        // ── Zoom Logic ────────────────────────────────────────────────────────
+        canvasEl.addEventListener('wheel', e => {
+            e.preventDefault();
+            const zoomSpeed = 0.001;
+            const delta = -e.deltaY;
+            const factor = Math.pow(1.1, delta / 100);
+            
+            const oldScale = scale;
+            scale = Math.min(Math.max(0.1, scale * factor), 5);
+            
+            // Adjust offset to zoom into mouse position
             const rect = canvasEl.getBoundingClientRect();
-            let newX = e.clientX - dragOffX;
-            let newY = e.clientY - dragOffY;
-            const nodeW = dragNode.el.offsetWidth;
-            const nodeH = dragNode.el.offsetHeight;
-            newX = Math.max(0, Math.min(newX, rect.width - nodeW));
-            newY = Math.max(0, Math.min(newY, rect.height - nodeH));
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Formula: newOffset = mousePos - (mousePos - oldOffset) * (newScale / oldScale)
+            offsetX = mouseX - (mouseX - offsetX) * (scale / oldScale);
+            offsetY = mouseY - (mouseY - offsetY) * (scale / oldScale);
+            
+            updateViewportTransform();
+        }, { passive: false });
 
-            dragNode.data.x = newX;
-            dragNode.data.y = newY;
-            dragNode.el.style.left = newX + 'px';
-            dragNode.el.style.top = newY + 'px';
-            updateEdges();
+        // ── Panning & Global Mouse ──────────────────────────────────────────
+        canvasEl.addEventListener('mousedown', e => {
+            if (isDraggingNode) return;
+            isPanning = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            canvasEl.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (isDraggingNode && dragNode) {
+                // Account for scale and current offset in drag calculation
+                // Actually, if nodes are inside viewport, their coordinate system is already scaled
+                // But e.clientX is global screen pixels.
+                // We want node.x in viewport pixels.
+                // clientX = (node.x * scale) + offsetX + canvasRect.left
+                // So node.x = (clientX - offsetX - canvasRect.left) / scale
+                const rect = canvasEl.getBoundingClientRect();
+                let newX = (e.clientX - offsetX - rect.left) / scale - (dragOffX - (rect.left + offsetX)/scale);
+                // Wait, simpler:
+                // dragOffX was (e.clientX / scale) - node.x at start.
+                // node.x = (e.clientX / scale) - dragOffX
+                
+                newX = (e.clientX / scale) - dragOffX;
+                let newY = (e.clientY / scale) - dragOffY;
+
+                dragNode.data.x = newX;
+                dragNode.data.y = newY;
+                dragNode.el.style.left = newX + 'px';
+                dragNode.el.style.top = newY + 'px';
+                updateEdges();
+                return;
+            }
+
+            if (isPanning) {
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                offsetX += dx;
+                offsetY += dy;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                updateViewportTransform();
+            }
         });
 
         document.addEventListener('mouseup', () => {
-            if (isDragging && dragNode) {
+            if (isDraggingNode && dragNode) {
                 dragNode.el.classList.remove('dragging');
             }
-            isDragging = false;
+            isDraggingNode = false;
             dragNode = null;
+            isPanning = false;
+            canvasEl.style.cursor = 'default';
         });
 
         // ── API call ──────────────────────────────────────────────────────────
@@ -483,7 +572,6 @@
             const promptStr = document.getElementById('ai-prompt').value.trim();
             if (!promptStr) return;
 
-            // Show loading
             loadingEl.style.display = 'flex';
             emptyEl.style.display = 'none';
             if (generateBtn) generateBtn.disabled = true;
@@ -502,7 +590,6 @@
                 edgesData = data.edges || [];
             } catch (err) {
                 console.error('Canvas API error:', err);
-                // Fallback demo so the user always sees something
                 nodesData = [
                     { id: 'goal', text: promptStr.slice(0, 30) + (promptStr.length > 30 ? '…' : ''), x: 320, y: 60 },
                     { id: 'step1', text: 'Define Budget', x: 60, y: 200 },
@@ -524,7 +611,6 @@
             }
         }
 
-        // Allow Enter key to submit
         document.getElementById('ai-prompt').addEventListener('keydown', e => {
             if (e.key === 'Enter') generateNodesFromPrompt();
         });
