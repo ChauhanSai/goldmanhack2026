@@ -251,5 +251,40 @@ def portfolio_frm_metrics():
         "metrics": metrics
     })
 
+@app.route('/api/portfolio/diversification_test', methods=['POST'])
+def portfolio_diversification_test():
+    data = request.json
+    portfolio = data.get('portfolio', [])
+    
+    if not portfolio:
+        return jsonify({"status": "error", "message": "No portfolio data provided"}), 400
+        
+    tickers = [item.get('ticker') for item in portfolio]
+    
+    # Feature Mapping from paper:
+    # User's Portfolio -> Sample P (Sequence of Portfolio Correlation Graphs)
+    # S&P 500 Benchmark -> Sample Q (Sequence of S&P 500 Correlation Graphs)
+    # We mock the Maximum Mean Discrepancy (MMD) two-sample test.
+    
+    mmd_statistic = round(random.uniform(0.01, 0.5), 4)
+    p_value = round(random.uniform(0.001, 0.15), 4)
+    is_structurally_different = bool(p_value < 0.05)
+    similarity_score = round(1.0 - mmd_statistic, 4)
+    
+    response_data = {
+        "status": "success",
+        "benchmark": "S&P 500",
+        "user_assets_analyzed": len(tickers),
+        "test_results": {
+            "mmd_statistic": mmd_statistic,
+            "p_value": p_value,
+            "is_structurally_different": is_structurally_different,
+            "graph_similarity_score": similarity_score,
+            "null_hypothesis": "Portfolio diversification structure equals S&P 500 diversification structure.",
+            "conclusion": "Rejected null hypothesis" if is_structurally_different else "Failed to reject null hypothesis"
+        }
+    }
+    return jsonify(response_data)
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
