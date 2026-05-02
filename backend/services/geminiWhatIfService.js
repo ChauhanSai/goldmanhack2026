@@ -6,6 +6,62 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+const TECH_TICKERS = new Set([
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "TSLA",
+  "META",
+  "GOOGL",
+  "GOOG",
+  "AMZN",
+  "AMD",
+  "INTC",
+  "QCOM",
+  "AVGO",
+  "ORCL",
+  "CRM",
+  "ADBE",
+  "NFLX",
+  "SMCI",
+  "TSM",
+  "ASML",
+  "MU",
+  "SNOW",
+  "PLTR",
+  "SHOP",
+  "QQQ",
+]);
+
+const BROAD_FUNDS = new Set([
+  "VOO",
+  "VTI",
+  "SPY",
+  "IVV",
+  "SCHB",
+  "ITOT",
+  "QQQ",
+  "DIA",
+]);
+
+const DEFENSIVE_TICKERS = new Set([
+  "BND",
+  "AGG",
+  "SGOV",
+  "SHY",
+  "BIL",
+  "VGIT",
+  "IEF",
+]);
+
+const CASH_LIKE_TICKERS = new Set([
+  "CASH",
+  "SGOV",
+  "SHY",
+  "BIL",
+  "SHV",
+]);
+
 const SCENARIOS = {
   market_drop: {
     scenarioTitle: "Market drops 20%",
@@ -219,6 +275,240 @@ const CUSTOM_COACH_JSON_SCHEMA = {
   ],
 };
 
+function normalizeTicker(value) {
+  return String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9.-]/g, "")
+    .slice(0, 12);
+}
+
+function normalizePortfolio(rawPortfolio = []) {
+  if (!Array.isArray(rawPortfolio)) {
+    return [];
+  }
+
+  const combined = new Map();
+
+  rawPortfolio.forEach((holding) => {
+    const ticker = normalizeTicker(holding?.ticker);
+    const value = Number(holding?.value);
+    if (!ticker || !Number.isFinite(value) || value <= 0) {
+      return;
+    }
+
+    combined.set(ticker, (combined.get(ticker) || 0) + value);
+  });
+
+  return Array.from(combined.entries())
+    .map(([ticker, value]) => ({ ticker, value: Number(value.toFixed(2)) }))
+    .sort((a, b) => b.value - a.value);
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+}
+
+function summarizePortfolio(portfolio, fallbackBaseAmount = 10000) {
+  const totalValue =
+    portfolio.reduce((sum, holding) => sum + holding.value, 0) ||
+    Math.max(Number(fallbackBaseAmount) || 0, 1000);
+
+  const holdings = portfolio.map((holding) => ({
+    ...holding,
+    weight: totalValue > 0 ? holding.value / totalValue : 0,
+  }));
+
+  return {
+    totalValue,
+    holdings,
+    topHoldings: holdings.slice(0, 4),
+    techHoldings: holdings.filter((holding) => TECH_TICKERS.has(holding.ticker)),
+    defensiveHolding: holdings.find((holding) => DEFENSIVE_TICKERS.has(holding.ticker)) || null,
+    broadHolding: holdings.find((holding) => BROAD_FUNDS.has(holding.ticker)) || null,
+    cashHolding: holdings.find((holding) => CASH_LIKE_TICKERS.has(holding.ticker)) || null,
+  };
+}
+
+function serializePortfolioForPrompt(summary) {
+  if (!summary.holdings.length) {
+    return "No dashboard holdings were provided.";
+  }
+
+  const lines = summary.holdings.slice(0, 8).map((holding) => {
+    const weightPct = (holding.weight * 100).toFixed(1);
+    return `- ${holding.ticker}: ${formatCurrency(holding.value)} (${weightPct}% of portfolio)`;
+  });
+
+  return [
+    `Total portfolio value: ${formatCurrency(summary.totalValue)}`,
+    ...lines,
+  ].join("\n");
+}
+
+function inferCustomScenarioFlags(customScenario) {
+  const text = String(customScenario || "").toLowerCase();
+  const percentMatch = text.match(/(\d{1,2}(?:\.\d+)?)\s*%/);
+  const dollarMatch = text.match(/\$ ?(\d{1,3}(?:,\d{3})*(?:\.\d+)?)/);
+  const yearMatch = text.match(/(?:in|next)\s+(\d{1,2})\s+year/);
+
+  return {
+    needsCash:
+      /withdraw|tuition|semester|rent|car|job|expense|medical|down payment|pay/i.test(text),
+    techRisk: /tech|semiconductor|chip|ai|software|cloud/i.test(text),
+    lowerRisk: /lower risk|safer|less risk|volatility/i.test(text),
+    inflationLike: /inflation|interest rate|rates stay high|purchasing power/i.test(text),
+    explicitPct: percentMatch ? Number(percentMatch[1]) / 100 : null,
+    explicitDollar: dollarMatch ? Number(dollarMatch[1].replace(/,/g, "")) : null,
+    explicitYear: yearMatch ? Number(yearMatch[1]) : null,
+  };
+}
+
+function buildPortfolioContext(summary) {
+  return {
+    totalValue: Number(summary.totalValue.toFixed(2)),
+    topHoldings: summary.topHoldings.map((holding) => ({
+      ticker: holding.ticker,
+      value: Number(holding.value.toFixed(2)),
+      weightPct: Number((holding.weight * 100).toFixed(1)),
+    })),
+  };
+}
+
+function buildPortfolioActionPlan({
+  scenarioKey,
+  customScenario,
+  portfolio,
+  baseAmount,
+}) {
+  const normalizedPortfolio = normalizePortfolio(portfolio);
+  const summary = summarizePortfolio(normalizedPortfolio, baseAmount);
+  const portfolioContext = buildPortfolioContext(summary);
+
+  if (!summary.holdings.length) {
+    return {
+      actionSteps: [],
+      recommendationSuffix: "",
+      promptSummary: serializePortfolioForPrompt(summary),
+      portfolioContext,
+    };
+  }
+
+  const flags = inferCustomScenarioFlags(customScenario);
+  const effectiveScenario =
+    scenarioKey === "custom"
+      ? flags.techRisk
+        ? "tech_crash"
+        : flags.needsCash
+          ? "withdrawal"
+          : flags.inflationLike
+            ? "inflation"
+            : flags.lowerRisk
+              ? "lower_risk"
+              : "market_drop"
+      : scenarioKey;
+
+  const nonCashHoldings = summary.holdings.filter(
+    (holding) => !CASH_LIKE_TICKERS.has(holding.ticker),
+  );
+  const trimCandidates =
+    effectiveScenario === "tech_crash" && summary.techHoldings.length
+      ? summary.techHoldings
+      : nonCashHoldings.filter(
+          (holding) =>
+            !BROAD_FUNDS.has(holding.ticker) && !DEFENSIVE_TICKERS.has(holding.ticker),
+        );
+  const primary = trimCandidates[0] || nonCashHoldings[0] || summary.holdings[0];
+  const secondary = trimCandidates[1] || nonCashHoldings[1] || null;
+
+  const destination = summary.defensiveHolding
+    ? summary.defensiveHolding.ticker
+    : summary.broadHolding
+      ? `${summary.broadHolding.ticker} plus a cash buffer`
+      : "a broad-market fund plus a cash buffer";
+
+  const primaryTrimPct =
+    effectiveScenario === "tech_crash"
+      ? 0.18
+      : effectiveScenario === "withdrawal"
+        ? 0.16
+        : effectiveScenario === "lower_risk"
+          ? 0.1
+          : 0.12;
+  const secondaryTrimPct = effectiveScenario === "tech_crash" ? 0.12 : 0.08;
+
+  const defaultCashNeed =
+    effectiveScenario === "withdrawal"
+      ? summary.totalValue * 0.2
+      : flags.needsCash
+        ? summary.totalValue * 0.12
+        : null;
+  const targetCashNeed = flags.explicitDollar
+    ? Math.min(flags.explicitDollar, summary.totalValue * 0.5)
+    : flags.explicitPct
+      ? Math.min(summary.totalValue * flags.explicitPct, summary.totalValue * 0.5)
+      : defaultCashNeed;
+
+  const actionSteps = [];
+
+  if (primary) {
+    actionSteps.push(
+      `Trim about ${Math.round(primaryTrimPct * 100)}% of ${primary.ticker} (${formatCurrency(
+        primary.value * primaryTrimPct,
+      )}) so one position carries less of the risk.`,
+    );
+  }
+
+  if (secondary && secondary.ticker !== primary?.ticker) {
+    actionSteps.push(
+      `Sell roughly ${Math.round(secondaryTrimPct * 100)}% of ${secondary.ticker} (${formatCurrency(
+        secondary.value * secondaryTrimPct,
+      )}) and redirect it to ${destination}.`,
+    );
+  } else if (primary) {
+    actionSteps.push(
+      `Move the proceeds from ${primary.ticker} into ${destination} instead of leaving all of it in the same theme.`,
+    );
+  }
+
+  if (targetCashNeed) {
+    actionSteps.push(
+      `Set aside about ${formatCurrency(targetCashNeed)} in cash or short-term Treasuries before the planned expense hits.`,
+    );
+  } else {
+    actionSteps.push(
+      `Try to keep your biggest single holding near or below ${effectiveScenario === "tech_crash" ? "25%" : "30%"} of the portfolio after the rebalance.`,
+    );
+  }
+
+  const topNames = [primary?.ticker, secondary?.ticker].filter(Boolean);
+  const recommendationSuffix = topNames.length
+    ? `Start with ${topNames.map((ticker) => `trimming ${ticker}`).join(" and ")}.`
+    : "";
+
+  return {
+    actionSteps: actionSteps.slice(0, 3),
+    recommendationSuffix,
+    promptSummary: serializePortfolioForPrompt(summary),
+    portfolioContext,
+  };
+}
+
+function mergeRecommendation(baseText, recommendationSuffix) {
+  const normalizedBase = String(baseText || "").trim();
+  if (!recommendationSuffix) {
+    return normalizedBase;
+  }
+  if (!normalizedBase) {
+    return recommendationSuffix;
+  }
+  return `${normalizedBase} ${recommendationSuffix}`.trim();
+}
+
 function validateScenarioKey(scenarioKey) {
   const normalized = String(scenarioKey || "").trim();
   if (!normalized || !SCENARIOS[normalized]) {
@@ -231,43 +521,77 @@ function normalizeCustomPrompt(customPrompt) {
   return String(customPrompt || "").trim().replace(/\s+/g, " ").slice(0, 180);
 }
 
-function buildFallbackResponse(scenarioKey, warning = null) {
+function buildFallbackResponse(
+  scenarioKey,
+  warning = null,
+  portfolio = [],
+  baseAmount = 10000,
+) {
   const scenario = SCENARIOS[scenarioKey];
   const warnings = [];
   if (warning) {
     warnings.push(warning);
   }
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey,
+    customScenario: "",
+    portfolio,
+    baseAmount,
+  });
 
   return {
     scenarioTitle: scenario.scenarioTitle,
     explanation: scenario.fallbackExplanation,
-    recommendedRebalance: scenario.fallbackRecommendedRebalance,
-    actionSteps: scenario.fallbackActionSteps,
+    recommendedRebalance: mergeRecommendation(
+      scenario.fallbackRecommendedRebalance,
+      actionPlan.recommendationSuffix,
+    ),
+    actionSteps:
+      actionPlan.actionSteps.length > 0
+        ? actionPlan.actionSteps
+        : scenario.fallbackActionSteps,
     noRebalance: scenario.noRebalance,
     rebalanced: scenario.rebalanced,
     disclaimer: "Educational estimate only, not financial advice.",
     warnings,
     source: "fallback",
+    portfolioContext: actionPlan.portfolioContext,
   };
 }
 
-function buildCustomFallbackResponse(customScenario = "Custom What-If", warning = null) {
+function buildCustomFallbackResponse(
+  customScenario = "Custom What-If",
+  warning = null,
+  portfolio = [],
+  baseAmount = 10000,
+) {
   const warnings = [];
   if (warning) {
     warnings.push(warning);
   }
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey: "custom",
+    customScenario,
+    portfolio,
+    baseAmount,
+  });
 
   return {
     scenarioTitle: customScenario || "Custom What-If",
     explanation:
       "This scenario could affect your future path, especially if it forces you to sell investments at a bad time.",
-    recommendedRebalance:
+    recommendedRebalance: mergeRecommendation(
       "Build a cash buffer for near-term needs and reduce concentration in riskier assets.",
-    actionSteps: [
-      "Set aside cash for planned expenses.",
-      "Reduce overexposure to one sector or stock.",
-      "Use a diversified mix for longer-term money.",
-    ],
+      actionPlan.recommendationSuffix,
+    ),
+    actionSteps:
+      actionPlan.actionSteps.length > 0
+        ? actionPlan.actionSteps
+        : [
+            "Set aside cash for planned expenses.",
+            "Reduce overexposure to one sector or stock.",
+            "Use a diversified mix for longer-term money.",
+          ],
     noRebalance: {
       label: "No Rebalance: less prepared",
       yearOneShock: -0.08,
@@ -285,6 +609,7 @@ function buildCustomFallbackResponse(customScenario = "Custom What-If", warning 
     disclaimer: "Educational estimate only, not financial advice.",
     warnings,
     source: "fallback",
+    portfolioContext: actionPlan.portfolioContext,
   };
 }
 
@@ -336,8 +661,14 @@ function normalizeActionSteps(value) {
     : [];
 }
 
-function normalizeCoachPayload(parsed, scenarioKey) {
+function normalizeCoachPayload(parsed, scenarioKey, portfolio = [], baseAmount = 10000) {
   const scenario = SCENARIOS[scenarioKey];
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey,
+    customScenario: "",
+    portfolio,
+    baseAmount,
+  });
   const actionSteps = normalizeActionSteps(parsed?.actionSteps);
 
   if (
@@ -352,8 +683,11 @@ function normalizeCoachPayload(parsed, scenarioKey) {
   return {
     scenarioTitle: scenario.scenarioTitle,
     explanation: parsed.explanation.trim(),
-    recommendedRebalance: parsed.recommendedRebalance.trim(),
-    actionSteps,
+    recommendedRebalance: mergeRecommendation(
+      parsed.recommendedRebalance.trim(),
+      actionPlan.recommendationSuffix,
+    ),
+    actionSteps: actionPlan.actionSteps.length > 0 ? actionPlan.actionSteps : actionSteps,
     noRebalance: scenario.noRebalance,
     rebalanced: scenario.rebalanced,
     disclaimer:
@@ -361,10 +695,22 @@ function normalizeCoachPayload(parsed, scenarioKey) {
       "Educational estimate only, not financial advice.",
     warnings: [],
     source: "gemini",
+    portfolioContext: actionPlan.portfolioContext,
   };
 }
 
-function normalizeCustomPayload(parsed, customScenario) {
+function normalizeCustomPayload(
+  parsed,
+  customScenario,
+  portfolio = [],
+  baseAmount = 10000,
+) {
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey: "custom",
+    customScenario,
+    portfolio,
+    baseAmount,
+  });
   const actionSteps = normalizeActionSteps(parsed?.actionSteps);
 
   if (
@@ -379,8 +725,11 @@ function normalizeCustomPayload(parsed, customScenario) {
   return {
     scenarioTitle: String(parsed.scenarioTitle || customScenario || "Custom What-If").trim().slice(0, 120),
     explanation: parsed.explanation.trim(),
-    recommendedRebalance: parsed.recommendedRebalance.trim(),
-    actionSteps,
+    recommendedRebalance: mergeRecommendation(
+      parsed.recommendedRebalance.trim(),
+      actionPlan.recommendationSuffix,
+    ),
+    actionSteps: actionPlan.actionSteps.length > 0 ? actionPlan.actionSteps : actionSteps,
     noRebalance: normalizeAssumptions(parsed.noRebalance, 0.05),
     rebalanced: normalizeAssumptions(parsed.rebalanced, 0.06),
     disclaimer:
@@ -388,16 +737,29 @@ function normalizeCustomPayload(parsed, customScenario) {
       "Educational estimate only, not financial advice.",
     warnings: [],
     source: "gemini",
+    portfolioContext: actionPlan.portfolioContext,
   };
 }
 
-async function generatePresetScenarioResponse(scenarioKey) {
+async function generatePresetScenarioResponse(
+  scenarioKey,
+  baseAmount = 10000,
+  portfolio = [],
+) {
   const scenario = SCENARIOS[scenarioKey];
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey,
+    customScenario: "",
+    portfolio,
+    baseAmount,
+  });
 
   if (!process.env.GEMINI_API_KEY) {
     return buildFallbackResponse(
       scenarioKey,
       "The coach is unavailable, so Moore Money is using a built-in response.",
+      portfolio,
+      baseAmount,
     );
   }
 
@@ -407,11 +769,15 @@ You are a friendly financial education coach for a beginner retail-investor app 
 The user selected this what-if scenario:
 "${scenario.scenarioTitle}"
 
+Dashboard portfolio snapshot:
+${actionPlan.promptSummary}
+
 Write a simple explanation and a clear rebalancing recommendation.
 
 Rules:
 - Do not give personalized financial advice.
-- Do not mention that you know the user's actual portfolio.
+- Use the dashboard holdings when you want to mention specific tickers.
+- If you mention selling, suggest trimming or reducing part of a position instead of liquidating everything.
 - Keep it beginner-friendly.
 - Do not use jargon unless you explain it simply.
 - Recommend easy-to-understand rebalancing actions.
@@ -441,25 +807,40 @@ Return exactly this JSON shape:
     });
 
     const parsed = safeJsonParse(response.text);
-    return normalizeCoachPayload(parsed, scenarioKey);
+    return normalizeCoachPayload(parsed, scenarioKey, portfolio, baseAmount);
   } catch {
     return buildFallbackResponse(
       scenarioKey,
       "The coach is temporarily unavailable. Showing a stable fallback plan instead.",
+      portfolio,
+      baseAmount,
     );
   }
 }
 
-async function generateCustomScenarioResponse(customScenario, baseAmount, years) {
+async function generateCustomScenarioResponse(
+  customScenario,
+  baseAmount,
+  years,
+  portfolio = [],
+) {
   const normalizedCustomScenario = normalizeCustomPrompt(customScenario);
   if (!normalizedCustomScenario) {
     throw new Error("Invalid what-if scenario");
   }
+  const actionPlan = buildPortfolioActionPlan({
+    scenarioKey: "custom",
+    customScenario: normalizedCustomScenario,
+    portfolio,
+    baseAmount,
+  });
 
   if (!process.env.GEMINI_API_KEY) {
     return buildCustomFallbackResponse(
       normalizedCustomScenario,
       "The coach is unavailable, so Moore Money is using a built-in response.",
+      portfolio,
+      baseAmount,
     );
   }
 
@@ -471,6 +852,8 @@ The user typed this custom what-if scenario:
 
 The current starting portfolio value is ${baseAmount}.
 The chart projects ${years} years.
+Dashboard portfolio snapshot:
+${actionPlan.promptSummary}
 
 Return STRICT JSON only. No markdown. No text outside JSON.
 
@@ -483,7 +866,8 @@ Your job:
 
 Rules:
 - This is educational, not personalized financial advice.
-- Do not say you know the user's real portfolio.
+- Use the dashboard holdings when you want to mention specific tickers.
+- If you mention selling, suggest trimming or reducing part of a position instead of liquidating everything.
 - Keep assumptions realistic and simple.
 - Do not make catastrophic assumptions unless the user explicitly says so.
 - yearOneShock should be between -0.50 and 0.10.
@@ -529,11 +913,18 @@ Return exactly:
     });
 
     const parsed = safeJsonParse(response.text);
-    return normalizeCustomPayload(parsed, normalizedCustomScenario);
+    return normalizeCustomPayload(
+      parsed,
+      normalizedCustomScenario,
+      portfolio,
+      baseAmount,
+    );
   } catch {
     return buildCustomFallbackResponse(
       normalizedCustomScenario,
       "The coach is temporarily unavailable. Showing a stable fallback plan instead.",
+      portfolio,
+      baseAmount,
     );
   }
 }
@@ -543,15 +934,16 @@ async function getWhatIfScenario({
   customScenario,
   baseAmount = 10000,
   years = 30,
+  portfolio = [],
 }) {
   const normalizedScenarioKey = String(scenarioKey || "").trim();
 
   if (normalizedScenarioKey === "custom") {
-    return generateCustomScenarioResponse(customScenario, baseAmount, years);
+    return generateCustomScenarioResponse(customScenario, baseAmount, years, portfolio);
   }
 
   const validScenarioKey = validateScenarioKey(normalizedScenarioKey);
-  return generatePresetScenarioResponse(validScenarioKey);
+  return generatePresetScenarioResponse(validScenarioKey, baseAmount, portfolio);
 }
 
 module.exports = {
@@ -559,5 +951,6 @@ module.exports = {
   clamp,
   normalizeNullableYear,
   normalizeAssumptions,
+  normalizePortfolio,
   getWhatIfScenario,
 };

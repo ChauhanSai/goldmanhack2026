@@ -19,6 +19,7 @@ def what_if():
             data.get("baseAmount"),
             data.get("years"),
             data.get("customScenario"),
+            data.get("portfolio"),
         )
         return jsonify(payload)
     except (WhatIfValidationError, WhatIfProviderError) as exc:

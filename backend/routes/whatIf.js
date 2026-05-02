@@ -5,12 +5,14 @@ async function getWhatIfPayload(body = {}) {
   const customScenario = String(body.customScenario || "").trim();
   const baseAmount = Number(body.baseAmount || 10000);
   const years = Number(body.years || 30);
+  const portfolio = Array.isArray(body.portfolio) ? body.portfolio : [];
 
   return getWhatIfScenario({
     scenarioKey,
     customScenario,
     baseAmount,
     years,
+    portfolio,
   });
 }
 

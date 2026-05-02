@@ -79,6 +79,36 @@ class WhatIfServiceTests(TestCase):
         self.assertEqual(mock_run.call_args.args[3], "What if I lose my job next year?")
 
     @patch("services.what_if_service._run_what_if_route")
+    def test_service_passes_portfolio_through(self, mock_run):
+        mock_run.return_value = {
+            "scenarioTitle": "Lower my risk",
+            "explanation": "Concentration increases volatility.",
+            "recommendedRebalance": "Trim the biggest holding first.",
+            "actionSteps": ["Step 1", "Step 2", "Step 3"],
+            "noRebalance": {
+                "label": "No Rebalance: higher volatility path",
+                "yearOneShock": 0,
+                "withdrawalYear": None,
+                "withdrawalPct": None,
+                "annualGrowthAfterShock": 0.05,
+            },
+            "rebalanced": {
+                "label": "Rebalanced: smoother lower-risk path",
+                "yearOneShock": 0,
+                "withdrawalYear": None,
+                "withdrawalPct": None,
+                "annualGrowthAfterShock": 0.06,
+            },
+            "disclaimer": "Educational estimate only, not financial advice.",
+        }
+
+        portfolio = [{"ticker": "AAPL", "value": 15000}, {"ticker": "TSLA", "value": 8500}]
+        payload = service.get_what_if_payload("lower_risk", 23500, 30, None, portfolio)
+
+        self.assertEqual(payload["scenarioTitle"], "Lower my risk")
+        self.assertEqual(mock_run.call_args.args[4], portfolio)
+
+    @patch("services.what_if_service._run_what_if_route")
     def test_route_returns_payload(self, mock_run):
         mock_run.return_value = {
             "scenarioTitle": "Inflation stays high",

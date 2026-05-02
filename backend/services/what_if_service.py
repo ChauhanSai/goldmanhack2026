@@ -30,8 +30,18 @@ def validate_scenario(scenario: str) -> str:
     return normalized
 
 
-def _cache_key(scenario: str, base_amount: Any, years: Any, custom_prompt: Any) -> str:
-    return f"{scenario}::{base_amount}::{years}::{custom_prompt}"
+def _cache_key(
+    scenario: str,
+    base_amount: Any,
+    years: Any,
+    custom_prompt: Any,
+    portfolio: Any,
+) -> str:
+    try:
+        portfolio_key = json.dumps(portfolio, sort_keys=True)
+    except TypeError:
+        portfolio_key = str(portfolio)
+    return f"{scenario}::{base_amount}::{years}::{custom_prompt}::{portfolio_key}"
 
 
 def _cache_get(key: str) -> dict[str, Any] | None:
@@ -56,6 +66,7 @@ def _run_what_if_route(
     base_amount: Any,
     years: Any,
     custom_prompt: Any = None,
+    portfolio: Any = None,
 ) -> dict[str, Any]:
     try:
         result = subprocess.run(
@@ -66,6 +77,7 @@ def _run_what_if_route(
                 str(base_amount if base_amount is not None else ""),
                 str(years if years is not None else ""),
                 str(custom_prompt if custom_prompt is not None else ""),
+                json.dumps(portfolio if portfolio is not None else []),
             ],
             cwd=BASE_DIR,
             capture_output=True,
@@ -101,13 +113,20 @@ def get_what_if_payload(
     base_amount: Any = None,
     years: Any = None,
     custom_scenario: Any = None,
+    portfolio: Any = None,
 ) -> dict[str, Any]:
     normalized_scenario = validate_scenario(scenario)
-    key = _cache_key(normalized_scenario, base_amount, years, custom_scenario)
+    key = _cache_key(normalized_scenario, base_amount, years, custom_scenario, portfolio)
     cached = _cache_get(key)
     if cached:
         return cached
 
-    payload = _run_what_if_route(normalized_scenario, base_amount, years, custom_scenario)
+    payload = _run_what_if_route(
+        normalized_scenario,
+        base_amount,
+        years,
+        custom_scenario,
+        portfolio,
+    )
     _cache_set(key, payload)
     return payload
