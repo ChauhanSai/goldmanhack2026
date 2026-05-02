@@ -365,9 +365,6 @@
                 <p id="coach-difference" class="text-body-md mt-4" style="color: #196ad4; font-weight: 800;">
                     The chart will update after you choose a scenario.
                 </p>
-                <p id="coach-disclaimer" class="text-label-sm mt-3 text-stone-500">
-                    Educational estimate only, not financial advice.
-                </p>
             </div>
         </div>
 
@@ -631,8 +628,6 @@
                 .map(step => `<li>${step}</li>`)
                 .join("");
 
-            document.getElementById("coach-disclaimer").innerText =
-                data.disclaimer || "Educational estimate only, not financial advice.";
 
             updateTwin();
         }
