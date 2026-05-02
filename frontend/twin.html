@@ -230,13 +230,11 @@
             height: 18px;
             border: 3px solid black;
             box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
-            background: linear-gradient(
-                to right,
-                #196ad4 0%,
-                #196ad4 var(--slider-progress, 0%),
-                #d8e1f3 var(--slider-progress, 0%),
-                #d8e1f3 100%
-            );
+            background: linear-gradient(to right,
+                    #196ad4 0%,
+                    #196ad4 var(--slider-progress, 0%),
+                    #d8e1f3 var(--slider-progress, 0%),
+                    #d8e1f3 100%);
             cursor: pointer;
         }
 
@@ -277,6 +275,7 @@
             margin-top: 0.9rem;
         }
     </style>
+    <link rel="icon" type="image/png" href="./cowIcons/logo.png" />
     <title>Moore Money</title>
 </head>
 
@@ -313,17 +312,23 @@
                 <div>
                     <h2 class="text-headline-md font-headline-md">What-If Coach</h2>
                     <p class="text-body-md">
-                        Pick a scenario or type your own. The coach will suggest a simple rebalance and Moore Money will update your future path.
+                        Pick a scenario or type your own. The coach will suggest a simple rebalance and Moore Money will
+                        update your future path.
                     </p>
                 </div>
             </div>
 
             <div id="scenario-buttons" class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4">
-                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="market_drop" onclick="selectScenario('market_drop')">Market drops 20%</button>
-                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="inflation" onclick="selectScenario('inflation')">Inflation stays high</button>
-                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="withdrawal" onclick="selectScenario('withdrawal')">Withdraw 20%</button>
-                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="tech_crash" onclick="selectScenario('tech_crash')">Tech stocks crash</button>
-                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="lower_risk" onclick="selectScenario('lower_risk')">Lower my risk</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="market_drop"
+                    onclick="selectScenario('market_drop')">Market drops 20%</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="inflation"
+                    onclick="selectScenario('inflation')">Inflation stays high</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="withdrawal"
+                    onclick="selectScenario('withdrawal')">Withdraw 20%</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="tech_crash"
+                    onclick="selectScenario('tech_crash')">Tech stocks crash</button>
+                <button class="scenario-btn neobrutalist-btn px-4 py-3" data-scenario="lower_risk"
+                    onclick="selectScenario('lower_risk')">Lower my risk</button>
             </div>
 
             <div class="mt-6 sketch-border p-4 bg-white">
@@ -332,18 +337,12 @@
                 </label>
 
                 <div class="flex flex-col md:flex-row gap-3">
-                    <input
-                        id="custom-scenario-input"
-                        type="text"
+                    <input id="custom-scenario-input" type="text"
                         class="flex-1 border-4 border-black px-4 py-3 font-['Work Sans'] text-body-md"
                         placeholder="Example: What if I need to withdraw $3,000 next year?"
-                        onkeydown="handleScenarioInputKeydown(event)"
-                    />
+                        onkeydown="handleScenarioInputKeydown(event)" />
 
-                    <button
-                        class="neobrutalist-btn px-6 py-3"
-                        onclick="submitCustomScenario()"
-                    >
+                    <button class="neobrutalist-btn px-6 py-3" onclick="submitCustomScenario()">
                         Ask Coach
                     </button>
                 </div>
