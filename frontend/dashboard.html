@@ -330,6 +330,69 @@
                     <ul id="holdings-list" style="list-style: none; padding: 0; margin: 0;"></ul>
                 </div>
 
+                <div class="neobrutalist-card p-6" id="exposure-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk</h3>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                            Ticker
+                            <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
+                        </label>
+                        <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+                    </div>
+                    
+                    <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
+                    <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
+
+                    <div id="exposure-content">
+                        <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <div>
+                                    <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
+                                    <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
+                                </div>
+                                <div>
+                                    <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
+                                </div>
+                            </div>
+                            <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
+                        </div>
+
+                        <div class="exposure-section" style="margin-bottom: 2rem;">
+                            <h4
+                                style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                Supply Chain Dependency
+                            </h4>
+                            <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
+                            <div id="suppliers-list"></div>
+                        </div>
+
+                        <div class="exposure-section" style="margin-bottom: 1rem;">
+                            <h4
+                                style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                Competitor Ecosystem Risk
+                            </h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
+                            <div id="competitors-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="neobrutalist-card p-6" id="trends-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Stock Trends (1M)</h3>
+                    </div>
+                    <div id="trends-loading" style="font-weight: 700; color: #64748b; margin-bottom: 1rem;">Loading trend data...</div>
+                    <div style="position: relative; height: 280px; display: none;" id="trends-chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="neobrutalist-card p-6" id="advanced-metrics-panel">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 class="text-headline-md font-headline-md" style="margin: 0;">Portfolio Health Insights</h3>
@@ -354,56 +417,6 @@
                             <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Analyzes core financial health based on company fundamentals.</p>
                             <div id="hfrp-metrics-content"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="neobrutalist-card p-6" id="exposure-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk</h3>
-                </div>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
-                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                    <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-                        Ticker
-                        <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
-                    </label>
-                    <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
-                </div>
-                
-                <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
-                <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
-
-                <div id="exposure-content">
-                    <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <div>
-                                <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
-                                <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
-                            </div>
-                            <div>
-                                <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
-                            </div>
-                        </div>
-                        <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
-                    </div>
-
-                    <div class="exposure-section" style="margin-bottom: 2rem;">
-                        <h4
-                            style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            Supply Chain Dependency
-                        </h4>
-                        <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
-                        <div id="suppliers-list"></div>
-                    </div>
-
-                    <div class="exposure-section" style="margin-bottom: 1rem;">
-                        <h4
-                            style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            Competitor Ecosystem Risk
-                        </h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
-                        <div id="competitors-list"></div>
                     </div>
                 </div>
             </div>
@@ -751,6 +764,125 @@
             }
             
             fetchHealthInsights();
+            fetchStockTrends();
+        }
+
+        let trendsChart;
+
+        async function fetchStockTrends() {
+            if (!portfolio || portfolio.length === 0) return;
+            
+            const trendsLoading = document.getElementById('trends-loading');
+            const trendsChartContainer = document.getElementById('trends-chart-container');
+            
+            trendsLoading.style.display = 'block';
+            trendsChartContainer.style.display = 'none';
+            
+            try {
+                const res = await fetch('/api/portfolio/trends', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portfolio })
+                });
+                const data = await res.json();
+                
+                if (data.status === 'success' && data.trends) {
+                    renderTrendsChart(data.trends);
+                    trendsLoading.style.display = 'none';
+                    trendsChartContainer.style.display = 'block';
+                } else {
+                    trendsLoading.textContent = "Failed to load trend data.";
+                }
+            } catch (error) {
+                console.error("Error fetching stock trends", error);
+                trendsLoading.textContent = "Error fetching trend data.";
+            }
+        }
+
+        function renderTrendsChart(trendsData) {
+            const tickers = Object.keys(trendsData);
+            if (tickers.length === 0) return;
+            
+            // Assume all tickers share roughly the same dates (e.g. 1 month)
+            // Use the dates from the first ticker
+            const labels = trendsData[tickers[0]].dates;
+            
+            const datasets = tickers.map((ticker, i) => {
+                const trend = trendsData[ticker];
+                const color = NEO_COLORS[i % NEO_COLORS.length];
+                const portfolioItem = portfolio.find(p => p.ticker === ticker);
+                const currentValue = portfolioItem ? portfolioItem.value : 0;
+                
+                // Scale historical prices to the current dollar value of the holding
+                const currentPrice = trend.prices[trend.prices.length - 1];
+                const investedValues = trend.prices.map(price => (price / currentPrice) * currentValue);
+                
+                return {
+                    label: `${ticker} (${trend.trend === 'up' ? '▲' : '▼'})`,
+                    data: investedValues,
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 3,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false
+                };
+            });
+            
+            if (trendsChart) {
+                trendsChart.data.labels = labels;
+                trendsChart.data.datasets = datasets;
+                trendsChart.update();
+            } else {
+                const ctx = document.getElementById('trendsChart').getContext('2d');
+                trendsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: { family: 'Work Sans', weight: '700', size: 12 },
+                                    boxWidth: 12
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += '$' + context.parsed.y.toFixed(2);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { maxTicksLimit: 6 }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         async function fetchHealthInsights() {
