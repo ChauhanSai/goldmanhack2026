@@ -420,7 +420,10 @@
 
         const currentRate = 1.05; // 5%
         const rebalancedRate = 1.08; // 8%
-        const baseAmount = 10000;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryVal = urlParams.get('value');
+        const baseAmount = queryVal && !isNaN(parseFloat(queryVal)) ? parseFloat(queryVal) : 10000;
 
         // Initialize Data
         const labels = Array.from({ length: 31 }, (_, i) => 2026 + i);

@@ -302,7 +302,7 @@
             <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
                 href="/canvas">Goals Canvas</a>
             <a class="font-['Epilogue'] font-black uppercase tracking-tighter text-black hover:bg-[#196ad4] hover:text-white transition-all duration-75 active:translate-x-1 active:translate-y-1"
-                href="/twin">Financial Twin</a>
+                href="#" onclick="goToTwin(event)">Financial Twin</a>
         </nav>
         <div class="flex items-center gap-4">
             <button class="neobrutalist-btn px-6 py-2" onclick="window.location.href='/'">Sign Out</button>
@@ -735,6 +735,12 @@
 
         // Neobrutalist-palette colors — solid, high-contrast, no gradients
         const NEO_COLORS = ['#196ad4', '#000000', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1'];
+
+        function goToTwin(e) {
+            e.preventDefault();
+            const total = portfolio.reduce((s, a) => s + a.value, 0);
+            window.location.href = `/twin?value=${total}`;
+        }
 
         function renderPortfolio() {
             const list = document.getElementById('holdings-list');
