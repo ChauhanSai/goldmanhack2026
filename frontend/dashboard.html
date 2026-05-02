@@ -463,7 +463,7 @@
                         onclick="startPlaidFlow()">
                         <div class="details">
                             <div class="title" style="margin-bottom: 0.25rem;">Connect Institution</div>
-                            <div class="desc">Link your broker securely via Plaid.</div>
+                            <div class="desc">Link your broker securely via <img src="/assets/Plaid.png" alt="Plaid" style="height: 1rem; vertical-align: middle; display: inline-block; position: relative; top: -1px;">.</div>
                         </div>
                     </button>
                     <button class="neobrutalist-card p-4 cursor-pointer mb-4" style="width: 100%; text-align: center;"
@@ -534,6 +534,7 @@
                                 <div style="font-weight: 500;">Goldman Sachs</div>
                             </div>
                         </div>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                     <div id="plaid-step-login" style="display: none; text-align: center;">
@@ -556,6 +557,7 @@
                         <button class="neobrutalist-btn px-4 py-2"
                             style="width: 100%; margin-top: 1rem; background: #111;"
                             onclick="submitPlaidLogin()">Submit</button>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                     <div id="plaid-step-mfa" style="display: none; text-align: left;">
@@ -581,11 +583,12 @@
                         <button class="neobrutalist-btn px-4 py-2"
                             style="width: 100%; margin-top: 1.5rem; background: #111;"
                             onclick="submitPlaidMfa()">Submit</button>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                     <div id="plaid-step-accounts" style="display: none; text-align: left;">
                         <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Choose which accounts to share with
-                            Aura Finance.</p>
+                            MOORE MONEY.</p>
                         <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
                             <label
                                 style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
@@ -613,20 +616,19 @@
                         </div>
                         <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;"
                             onclick="submitPlaidAccounts()">Continue</button>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                     <div id="plaid-step-consent" style="display: none; text-align: left;">
                         <div style="text-align: center; margin-bottom: 2rem;">
                             <div
                                 style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                                <div
-                                    style="width: 50px; height: 50px; background: var(--brand-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">
-                                    AF</div>
+                                <img src="./cowIcons/logo.png" alt="Moore Money" style="width: 50px; height: 50px; border-radius: 8px; object-fit: contain;">
                                 <div style="color: var(--text-muted); font-size: 1.5rem;">&#8646;</div>
                                 <img id="plaid-consent-logo" src="" alt="Bank Logo"
                                     style="height: 2.5rem; object-fit: contain; display: inline-block;">
                             </div>
-                            <p style="color: var(--text-muted); font-size: 0.95rem;">Aura Finance wants to access your
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">MOORE MONEY wants to access your
                                 <span id="plaid-consent-bank" style="font-weight:600; color: var(--text-main);"></span>
                                 data.
                             </p>
@@ -647,14 +649,16 @@
                             Secured by Plaid. You can revoke access anytime.</p>
                         <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;"
                             onclick="submitPlaidConsent()">Allow</button>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                     <div id="plaid-step-success" style="display: none; text-align: center; padding: 2rem 0;">
-                        <div style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">✅</div>
+                        <img src="/assets/Checkmark.png" alt="Success Checkmark" style="height: 4rem; margin-bottom: 1rem; display: inline-block;">
                         <h2 style="margin-bottom: 0.5rem;">Account connected</h2>
                         <p style="color: var(--text-muted); margin-bottom: 2rem;">You're all set.</p>
                         <button class="neobrutalist-btn px-4 py-2" style="width: 100%; background: #111;"
                             onclick="finishPlaidSuccess()">Done</button>
+                        <div style="text-align: center; margin-top: 1.5rem;"><span style="font-size: 0.8rem; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">Powered by <img src="/assets/Plaid.png" alt="Plaid" style="height: 1.2rem;"></span></div>
                     </div>
 
                 </div>
