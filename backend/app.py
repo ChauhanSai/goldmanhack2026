@@ -77,7 +77,7 @@ def canvas_prompt():
     try:
         response = gemini_client.models.generate_content(
             model='gemini-2.5-flash',
-            contents=f"Generate a financial or personal goal directed graph of nodes and edges for the following goal/prompt: '{prompt}'. Break down the goal into actionable steps. ALWAYS include a node with id 'start' and a node with id 'finish'. The 'start' node must always be positioned at the top left (x=50, y=50) and represent the beginning. The 'finish' node should represent the end goal. Make the rest of the graph visually pleasing with nodes distributed (x between 100 and 800, y between 50 and 600). Nodes should have short, actionable text.",
+            contents=f"Generate a financial or personal goal directed graph of nodes and edges for the following goal/prompt: '{prompt}'. Break down the goal into actionable steps. ALWAYS include a node with id 'start' and a node with id 'finish'. The 'start' node must always be positioned at the top left (x=50, y=50) and represent the beginning. The 'finish' node should represent the end goal. Make the rest of the graph visually pleasing with nodes distributed (x between 100 and 800, y between 50 and 600). Nodes should have short, actionable text. Generate a maximum of 10 nodes.",
             config={
                 'response_mime_type': 'application/json',
                 'response_schema': GraphResponse,

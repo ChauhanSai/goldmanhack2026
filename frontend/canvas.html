@@ -314,9 +314,21 @@
         </div>
 
         <div class="prompt-bar">
-            <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
-            <button class="neobrutalist-btn px-4 py-2" onclick="generateNodesFromPrompt()">
+            <div class="group" style="flex: 1; display: flex; position: relative;">
+                <input type="text" id="ai-prompt" placeholder="e.g. 'I want to buy a house in 5 years'">
+                <div id="disabled-prompt-tooltip"
+                    class="absolute -top-16 left-4 bg-white border-2 border-black p-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none" style="display: none;">
+                    <p class="font-label-bold text-sm">"Clear the canvas to set a new goal, boss!"</p>
+                    <div
+                        class="absolute bottom-[-10px] left-6 w-4 h-4 bg-white border-b-2 border-r-2 border-black rotate-45">
+                    </div>
+                </div>
+            </div>
+            <button class="neobrutalist-btn px-4 py-2" id="generate-btn" onclick="generateNodesFromPrompt()">
                 Generate Path
+            </button>
+            <button class="neobrutalist-btn px-4 py-2" id="clear-btn" style="display: none; background-color: #ef4444;" onclick="clearCanvas()">
+                Clear Canvas
             </button>
         </div>
 
@@ -346,7 +358,9 @@
         const svgLayer = document.getElementById('svg-layer');
         const emptyEl = document.getElementById('canvas-empty');
         const loadingEl = document.getElementById('canvas-loading');
-        const generateBtn = document.querySelector('.neobrutalist-btn[onclick="generateNodesFromPrompt()"]');
+        const aiPromptInput = document.getElementById('ai-prompt');
+        const generateBtn = document.getElementById('generate-btn');
+        const clearBtn = document.getElementById('clear-btn');
 
         // Viewport element to contain everything we want to transform
         let viewportEl;
@@ -569,12 +583,15 @@
 
         // ── API call ──────────────────────────────────────────────────────────
         async function generateNodesFromPrompt() {
-            const promptStr = document.getElementById('ai-prompt').value.trim();
+            const promptStr = aiPromptInput.value.trim();
             if (!promptStr) return;
 
             loadingEl.style.display = 'flex';
             emptyEl.style.display = 'none';
             if (generateBtn) generateBtn.disabled = true;
+            aiPromptInput.disabled = true;
+            const tooltip = document.getElementById('disabled-prompt-tooltip');
+            if (tooltip) tooltip.style.display = 'block';
 
             try {
                 const res = await fetch('/api/canvas/prompt', {
@@ -606,12 +623,27 @@
                 ];
             } finally {
                 loadingEl.style.display = 'none';
-                if (generateBtn) generateBtn.disabled = false;
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.style.display = 'none';
+                }
+                if (clearBtn) clearBtn.style.display = 'block';
                 renderCanvas();
             }
         }
 
-        document.getElementById('ai-prompt').addEventListener('keydown', e => {
+        function clearCanvas() {
+            nodesData = [];
+            edgesData = [];
+            aiPromptInput.disabled = false;
+            const tooltip = document.getElementById('disabled-prompt-tooltip');
+            if (tooltip) tooltip.style.display = 'none';
+            if (generateBtn) generateBtn.style.display = 'block';
+            if (clearBtn) clearBtn.style.display = 'none';
+            renderCanvas();
+        }
+
+        aiPromptInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') generateNodesFromPrompt();
         });
     </script>
