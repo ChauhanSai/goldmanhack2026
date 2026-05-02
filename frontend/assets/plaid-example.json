@@ -37,15 +37,6 @@
       "close_price": 260.50,
       "close_price_as_of": "2026-04-30",
       "iso_currency_code": "USD"
-    },
-    {
-      "security_id": "sec_004",
-      "ticker_symbol": "JGROX",
-      "name": "JPMorgan Growth Advantage Fund",
-      "type": "mutual_fund",
-      "close_price": 28.40,
-      "close_price_as_of": "2026-04-30",
-      "iso_currency_code": "USD"
     }
   ],
   "holdings": [

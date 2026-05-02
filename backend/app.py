@@ -277,6 +277,83 @@ def portfolio_diversification_test():
     }
     return jsonify(response_data)
 
+@app.route('/api/portfolio/trends', methods=['POST'])
+def portfolio_trends():
+    data = request.json
+    portfolio = data.get('portfolio', [])
+    tickers = [item.get('ticker') for item in portfolio if item.get('ticker')]
+    
+    CACHE_FILE = 'stock_cache.json'
+    cache_data = {}
+    
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, 'r') as f:
+                cache_data = json.load(f)
+        except Exception:
+            pass
+            
+    today = datetime.now().strftime('%Y-%m-%d')
+    results = {}
+    needs_save = False
+    
+    for ticker in tickers:
+        # Check if we have recent data in cache
+        if ticker in cache_data and cache_data[ticker].get('date') == today:
+            results[ticker] = cache_data[ticker]
+            continue
+            
+        try:
+            stock = yf.Ticker(ticker)
+            hist = stock.history(period="1mo")
+            if hist.empty:
+                raise ValueError("No data found")
+            
+            prices = hist['Close'].tolist()
+            dates = [d.strftime('%Y-%m-%d') for d in hist.index]
+            
+            start_price = prices[0]
+            end_price = prices[-1]
+            trend = "up" if end_price >= start_price else "down"
+            
+            ticker_data = {
+                "date": today,
+                "prices": prices,
+                "dates": dates,
+                "trend": trend,
+                "start_price": start_price,
+                "end_price": end_price
+            }
+            
+            cache_data[ticker] = ticker_data
+            results[ticker] = ticker_data
+            needs_save = True
+        except Exception as e:
+            print(f"Error fetching data for {ticker}: {e}")
+            # Fallback for unlisted assets like CASH
+            dates = [(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(20, -1, -1)]
+            prices = [1.0 for _ in dates]
+            ticker_data = {
+                "date": today,
+                "prices": prices,
+                "dates": dates,
+                "trend": "up",
+                "start_price": 1.0,
+                "end_price": 1.0
+            }
+            cache_data[ticker] = ticker_data
+            results[ticker] = ticker_data
+            needs_save = True
+            
+    if needs_save:
+        try:
+            with open(CACHE_FILE, 'w') as f:
+                json.dump(cache_data, f)
+        except Exception as e:
+            print(f"Failed to write cache: {e}")
+            
+    return jsonify({"status": "success", "trends": results})
+
 @app.route('/api/portfolio/hfrp_risk', methods=['POST'])
 def portfolio_hfrp_risk():
     data = request.json

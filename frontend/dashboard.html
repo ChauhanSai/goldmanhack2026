@@ -314,66 +314,109 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- LEFT: Asset Allocation -->
-            <div class="neobrutalist-card p-6" id="user-portfolio">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 class="text-headline-md font-headline-md" style="margin: 0;">Asset Allocation</h3>
-                    <button class="neobrutalist-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;"
-                        onclick="openManageModal()">+ Manage</button>
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- LEFT: Asset Allocation -->
+                <div class="neobrutalist-card p-6" id="user-portfolio">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Asset Allocation</h3>
+                        <button class="neobrutalist-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;"
+                            onclick="openManageModal()">+ Manage</button>
+                    </div>
+                    <!-- explicit height so Chart.js can render the doughnut -->
+                    <div style="position: relative; height: 280px; margin-bottom: 1.5rem;">
+                        <canvas id="allocationChart"></canvas>
+                    </div>
+                    <ul id="holdings-list" style="list-style: none; padding: 0; margin: 0;"></ul>
                 </div>
-                <!-- explicit height so Chart.js can render the doughnut -->
-                <div style="position: relative; height: 280px; margin-bottom: 1.5rem;">
-                    <canvas id="allocationChart"></canvas>
+
+                <div class="neobrutalist-card p-6" id="exposure-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk</h3>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                            Ticker
+                            <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
+                        </label>
+                        <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+                    </div>
+                    
+                    <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
+                    <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
+
+                    <div id="exposure-content">
+                        <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <div>
+                                    <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
+                                    <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
+                                </div>
+                                <div>
+                                    <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
+                                </div>
+                            </div>
+                            <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
+                        </div>
+
+                        <div class="exposure-section" style="margin-bottom: 2rem;">
+                            <h4
+                                style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                Supply Chain Dependency
+                            </h4>
+                            <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
+                            <div id="suppliers-list"></div>
+                        </div>
+
+                        <div class="exposure-section" style="margin-bottom: 1rem;">
+                            <h4
+                                style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
+                                Competitor Ecosystem Risk
+                            </h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
+                            <div id="competitors-list"></div>
+                        </div>
+                    </div>
                 </div>
-                <ul id="holdings-list" style="list-style: none; padding: 0; margin: 0;"></ul>
             </div>
 
-            <div class="neobrutalist-card p-6" id="exposure-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk</h3>
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="neobrutalist-card p-6" id="trends-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Stock Trends (1M)</h3>
+                    </div>
+                    <div id="trends-loading" style="font-weight: 700; color: #64748b; margin-bottom: 1rem;">Loading trend data...</div>
+                    <div style="position: relative; height: 280px; display: none;" id="trends-chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
                 </div>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
-                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                    <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-                        Ticker
-                        <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
-                    </label>
-                    <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
-                </div>
-                
-                <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
-                <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
 
-                <div id="exposure-content">
-                    <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <div>
-                                <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
-                                <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
-                            </div>
-                            <div>
-                                <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
-                            </div>
+                <div class="neobrutalist-card p-6" id="advanced-metrics-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="text-headline-md font-headline-md" style="margin: 0;">Portfolio Health Insights</h3>
+                    </div>
+                    <div id="metrics-loading" style="font-weight: 700; color: #64748b;">Loading insights...</div>
+                    <div id="metrics-content" style="display: none;">
+                        <!-- FRM -->
+                        <div class="exposure-section" style="margin-bottom: 2rem;">
+                            <h4 style="color: #196ad4; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">Systemic Risk (FRM)</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Measures how much your portfolio is exposed to market-wide shocks.</p>
+                            <div id="frm-metrics-content"></div>
                         </div>
-                        <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
-                    </div>
-
-                    <div class="exposure-section" style="margin-bottom: 2rem;">
-                        <h4
-                            style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            Supply Chain Dependency
-                        </h4>
-                        <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
-                        <div id="suppliers-list"></div>
-                    </div>
-
-                    <div class="exposure-section" style="margin-bottom: 1rem;">
-                        <h4
-                            style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            Competitor Ecosystem Risk
-                        </h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
-                        <div id="competitors-list"></div>
+                        <!-- Diversification -->
+                        <div class="exposure-section" style="margin-bottom: 2rem;">
+                            <h4 style="color: #10b981; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">Diversification Test</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Compares your portfolio's diversity against the S&P 500 benchmark.</p>
+                            <div id="div-metrics-content"></div>
+                        </div>
+                        <!-- HFRP Risk -->
+                        <div class="exposure-section" style="margin-bottom: 1rem;">
+                            <h4 style="color: #f59e0b; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 800;">Fundamental Risks (HFRP)</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Analyzes core financial health based on company fundamentals.</p>
+                            <div id="hfrp-metrics-content"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -676,7 +719,7 @@
             if (allocationChart) {
                 allocationChart.data.labels = labels;
                 allocationChart.data.datasets[0].data = data;
-                allocationChart.data.datasets[0].backgroundColor = NEO_COLORS.slice(0, data.length);
+                allocationChart.data.datasets[0].backgroundColor = data.map((_, idx) => NEO_COLORS[idx % NEO_COLORS.length]);
                 allocationChart.update();
             } else {
                 const ctx = document.getElementById('allocationChart').getContext('2d');
@@ -686,7 +729,7 @@
                         labels: labels,
                         datasets: [{
                             data: data,
-                            backgroundColor: NEO_COLORS.slice(0, data.length),
+                            backgroundColor: data.map((_, idx) => NEO_COLORS[idx % NEO_COLORS.length]),
                             borderColor: '#000',
                             borderWidth: 3
                         }]
@@ -719,6 +762,274 @@
                     }
                 });
             }
+            
+            fetchHealthInsights();
+            fetchStockTrends();
+        }
+
+        let trendsChart;
+
+        async function fetchStockTrends() {
+            if (!portfolio || portfolio.length === 0) return;
+            
+            const trendsLoading = document.getElementById('trends-loading');
+            const trendsChartContainer = document.getElementById('trends-chart-container');
+            
+            trendsLoading.style.display = 'block';
+            trendsChartContainer.style.display = 'none';
+            
+            try {
+                const res = await fetch('/api/portfolio/trends', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portfolio })
+                });
+                const data = await res.json();
+                
+                if (data.status === 'success' && data.trends) {
+                    renderTrendsChart(data.trends);
+                    trendsLoading.style.display = 'none';
+                    trendsChartContainer.style.display = 'block';
+                } else {
+                    trendsLoading.textContent = "Failed to load trend data.";
+                }
+            } catch (error) {
+                console.error("Error fetching stock trends", error);
+                trendsLoading.textContent = "Error fetching trend data.";
+            }
+        }
+
+        function renderTrendsChart(trendsData) {
+            const tickers = Object.keys(trendsData);
+            if (tickers.length === 0) return;
+            
+            // Assume all tickers share roughly the same dates (e.g. 1 month)
+            // Use the dates from the first ticker
+            const labels = trendsData[tickers[0]].dates;
+            
+            const datasets = tickers.map((ticker, i) => {
+                const trend = trendsData[ticker];
+                const portfolioIndex = portfolio.findIndex(p => p.ticker === ticker);
+                const color = NEO_COLORS[portfolioIndex >= 0 ? portfolioIndex % NEO_COLORS.length : i % NEO_COLORS.length];
+                const portfolioItem = portfolio.find(p => p.ticker === ticker);
+                const currentValue = portfolioItem ? portfolioItem.value : 0;
+                
+                // Scale historical prices to the current dollar value of the holding
+                const currentPrice = trend.prices[trend.prices.length - 1];
+                const investedValues = trend.prices.map(price => (price / currentPrice) * currentValue);
+                
+                return {
+                    label: `${ticker} (${trend.trend === 'up' ? '▲' : '▼'})`,
+                    data: investedValues,
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 3,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false
+                };
+            });
+            
+            if (trendsChart) {
+                trendsChart.data.labels = labels;
+                trendsChart.data.datasets = datasets;
+                trendsChart.update();
+            } else {
+                const ctx = document.getElementById('trendsChart').getContext('2d');
+                trendsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: { family: 'Work Sans', weight: '700', size: 12 },
+                                    boxWidth: 12
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += '$' + context.parsed.y.toFixed(2);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { maxTicksLimit: 6 }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function fetchHealthInsights() {
+            if (!portfolio || portfolio.length === 0) return;
+            
+            const metricsContent = document.getElementById('metrics-content');
+            const metricsLoading = document.getElementById('metrics-loading');
+            if(!metricsContent || !metricsLoading) return;
+            
+            metricsLoading.style.display = 'block';
+            metricsContent.style.display = 'none';
+            
+            try {
+                const frmRes = await fetch('/api/portfolio/frm_metrics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portfolio })
+                });
+                const frmData = await frmRes.json();
+                
+                const divRes = await fetch('/api/portfolio/diversification_test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portfolio })
+                });
+                const divData = await divRes.json();
+                
+                const hfrpPromises = portfolio.map(a => 
+                    fetch('/api/portfolio/hfrp_risk', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker: a.ticker })
+                    }).then(res => res.json()).catch(err => null)
+                );
+                const hfrpResults = await Promise.all(hfrpPromises);
+                
+                renderHealthInsights(frmData, divData, hfrpResults);
+                
+                metricsLoading.style.display = 'none';
+                metricsContent.style.display = 'block';
+            } catch (error) {
+                console.error("Error fetching health insights", error);
+                metricsLoading.textContent = "Failed to load insights.";
+            }
+        }
+
+        function renderHealthInsights(frmData, divData, hfrpResults) {
+            let frmHtml = `
+                <div style="margin-bottom: 1rem;">
+                    <span style="font-weight: 700; font-size: 1.1rem;">Overall Market Shock Risk: </span>
+                    <span style="font-size: 1.1rem; color: #ef4444;">${(frmData.frm_index * 100).toFixed(2)}%</span>
+                </div>
+                <div style="overflow-x: auto; border: 2px solid black; box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                        <thead style="background: #f8fafc; border-bottom: 2px solid black;">
+                            <tr>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">Asset</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Individual Stock Risk">Base Risk</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Exposure to Other Stocks">Inward Exposure</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Influence on Other Stocks">Market Influence</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Importance in Market Network">Network Importance</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Bridge Between Market Sectors">Sector Bridge Score</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Connection to Overall Market">Market Connection</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Recommended Safe Weight">Rec. Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            for (const ticker in frmData.metrics) {
+                const m = frmData.metrics[ticker];
+                frmHtml += `
+                            <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
+                                <td style="padding: 0.5rem; font-weight: 700; border-right: 1px solid #e2e8f0;">${ticker}</td>
+                                <td style="padding: 0.5rem;">${(m.lambda_risk * 100).toFixed(2)}%</td>
+                                <td style="padding: 0.5rem;">${m.in_degree}</td>
+                                <td style="padding: 0.5rem;">${m.out_degree}</td>
+                                <td style="padding: 0.5rem;">${m.eigenvector_centrality.toFixed(4)}</td>
+                                <td style="padding: 0.5rem;">${m.betweenness_centrality.toFixed(4)}</td>
+                                <td style="padding: 0.5rem;">${m.closeness_centrality.toFixed(4)}</td>
+                                <td style="padding: 0.5rem; font-weight: 700; color: #10b981;">${(m.upHRP_weight * 100).toFixed(2)}%</td>
+                            </tr>
+                `;
+            }
+            frmHtml += `</tbody></table></div>`;
+            document.getElementById('frm-metrics-content').innerHTML = frmHtml;
+
+            const t = divData.test_results;
+            const isDiff = t.is_structurally_different ? "Yes" : "No";
+            const conc = t.is_structurally_different ? "Your portfolio is significantly different from the S&P 500." : "Your portfolio matches the S&P 500 diversification.";
+            let divHtml = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="border-2 border-black p-3 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Similarity to S&P 500</div>
+                        <div style="font-size: 1.5rem; font-weight: 900; font-family: 'Epilogue', sans-serif;">${(t.graph_similarity_score * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="border-2 border-black p-3 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Statistically Different?</div>
+                        <div style="font-size: 1.5rem; font-weight: 900; font-family: 'Epilogue', sans-serif; color: ${t.is_structurally_different ? '#ef4444' : '#10b981'};">${isDiff}</div>
+                    </div>
+                </div>
+                <div class="text-sm bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <p style="margin-bottom: 0.5rem;"><strong>Statistical Gap:</strong> ${t.mmd_statistic.toFixed(4)}</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Confidence P-Value:</strong> ${t.p_value.toFixed(4)}</p>
+                    <p><strong>Conclusion:</strong> ${conc}</p>
+                </div>
+            `;
+            document.getElementById('div-metrics-content').innerHTML = divHtml;
+
+            let hfrpHtml = `
+                <div style="overflow-x: auto; border: 2px solid black; box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                        <thead style="background: #f8fafc; border-bottom: 2px solid black;">
+                            <tr>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;">Asset</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Debt Health Risk">Debt Risk</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Cash Shortage Risk">Cash Shortage Risk</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Volatility Risk">Volatility Risk</th>
+                                <th style="padding: 0.5rem; font-family: 'Epilogue', sans-serif;" title="Profitability Risk">Profitability Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            hfrpResults.forEach(res => {
+                if (res && res.status === 'success' && res.hfrp_risk_predictions) {
+                    const r = res.hfrp_risk_predictions;
+                    hfrpHtml += `
+                        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
+                            <td style="padding: 0.5rem; font-weight: 700; border-right: 1px solid #e2e8f0;">${res.ticker}</td>
+                            <td style="padding: 0.5rem;">${(r.credit_risk * 100).toFixed(1)}%</td>
+                            <td style="padding: 0.5rem;">${(r.liquidity_risk * 100).toFixed(1)}%</td>
+                            <td style="padding: 0.5rem;">${(r.market_risk * 100).toFixed(1)}%</td>
+                            <td style="padding: 0.5rem;">${(r.operational_risk * 100).toFixed(1)}%</td>
+                        </tr>
+                    `;
+                } else if(res && res.ticker) {
+                    hfrpHtml += `
+                        <tr style="border-bottom: 1px solid #e2e8f0; background: white;">
+                            <td style="padding: 0.5rem; font-weight: 700; border-right: 1px solid #e2e8f0;">${res.ticker}</td>
+                            <td style="padding: 0.5rem; color: #64748b;" colspan="4">Data unavailable</td>
+                        </tr>
+                    `;
+                }
+            });
+            hfrpHtml += `</tbody></table></div>`;
+            document.getElementById('hfrp-metrics-content').innerHTML = hfrpHtml;
         }
 
         renderPortfolio();
