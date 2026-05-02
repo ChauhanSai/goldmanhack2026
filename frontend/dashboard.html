@@ -310,19 +310,12 @@
 
     <main class="max-w-7xl mx-auto px-4 pt-12 pb-12">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>Portfolio Dashboard</h1>
-            <div class="scan-toolbar">
-                <label for="ecosystem-ticker">
-                    Ticker
-                    <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL">
-                </label>
-                <button class="btn" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
-            </div>
+            <h1 class="text-headline-xl font-headline-xl">Portfolio Dashboard</h1>
         </div>
 
         <div class="dashboard-grid">
             <!-- LEFT: Asset Allocation -->
-            <div class="neobrutalist-card p-6">
+            <div class="neobrutalist-card p-6" id="user-portfolio">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h3 class="text-headline-md font-headline-md" style="margin: 0;">Asset Allocation</h3>
                     <button class="neobrutalist-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;"
@@ -335,42 +328,51 @@
                 <ul id="holdings-list" style="list-style: none; padding: 0; margin: 0;"></ul>
             </div>
 
-            <div class="card" id="exposure-panel">
-                <h3>Supply Chain & Competitor Risk</h3>
-                <p style="color: var(--text-muted); margin-bottom: 1rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
+            <div class="neobrutalist-card p-6" id="exposure-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="text-headline-md font-headline-md" style="margin: 0;">Supply Chain & Competitor Risk</h3>
+                </div>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Enter a ticker like AAPL to scan the top 3 supplier dependencies and top 3 competitor exposures.</p>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <label for="ecosystem-ticker" style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                        Ticker
+                        <input id="ecosystem-ticker" type="text" value="" maxlength="12" placeholder="AAPL" class="border-2 border-black p-2 font-['Work_Sans'] rounded-none focus:outline-none focus:ring-0">
+                    </label>
+                    <button class="neobrutalist-btn px-4 py-2" id="scan-button" type="button" onclick="fetchExposureData()">Scan for Hidden Exposure</button>
+                </div>
                 
-                <div id="exposure-error" class="inline-message error" style="display: none;"></div>
-                <div id="exposure-warning" class="inline-message warning" style="display: none;"></div>
+                <div id="exposure-error" style="display: none; background: #fca5a5; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
+                <div id="exposure-warning" style="display: none; background: #fef08a; border: 2px solid black; padding: 0.75rem; margin-bottom: 1rem; font-weight: bold;"></div>
 
                 <div id="exposure-content">
-                    <div class="exposure-section">
-                        <div class="summary-header">
+                    <div class="exposure-section" style="margin-bottom: 2rem; border: 2px solid black; padding: 1rem; background: #f8fafc;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                             <div>
-                                <h4 style="color: var(--brand-blue); margin-bottom: 0.25rem;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
+                                <h4 style="color: #196ad4; margin-bottom: 0.25rem; font-weight: 800; font-family: 'Epilogue', sans-serif;">Directional Map for <span id="summary-ticker">this ticker</span></h4>
                                 <p id="summary-explanation" style="font-size: 0.9rem;">Scan a ticker to see an AI-estimated relationship map.</p>
                             </div>
-                            <div class="summary-badges">
-                                <span id="source-badge" class="summary-badge source">No data</span>
+                            <div>
+                                <span id="source-badge" class="neobrutalist-btn" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; background: #fef08a; color: #191c22; display: inline-block;">No data</span>
                             </div>
                         </div>
-                        <p id="meta-copy" style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">This scan is directional. It is not verified supplier data.</p>
+                        <p id="meta-copy" style="font-size: 0.9rem; color: #64748b; margin: 0; margin-top: 0.5rem;">This scan is directional. It is not verified supplier data.</p>
                     </div>
 
-                    <div class="exposure-section">
+                    <div class="exposure-section" style="margin-bottom: 2rem;">
                         <h4
                             style="color: #196ad4; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            &#x1F517; Supply Chain Dependency
+                            Supply Chain Dependency
                         </h4>
-                        <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top supplier dependencies or input categories that may matter for this business.</p>
+                        <p id="suppliers-copy" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top supplier dependencies or input categories that may matter for this business.</p>
                         <div id="suppliers-list"></div>
                     </div>
 
-                    <div class="exposure-section">
+                    <div class="exposure-section" style="margin-bottom: 1rem;">
                         <h4
                             style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem; font-family: 'Epilogue', sans-serif; margin-bottom: 0.5rem;">
-                            &#x2694;&#xFE0F; Competitor Ecosystem Risk
+                            Competitor Ecosystem Risk
                         </h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Top competitor names that may pressure market share or ecosystem positioning.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">Top competitor names that may pressure market share or ecosystem positioning.</p>
                         <div id="competitors-list"></div>
                     </div>
                 </div>
@@ -967,25 +969,25 @@
 
         function renderRelationshipItems(target, items, emptyMessage) {
             if (!items.length) {
-                target.innerHTML = `<p class="empty-state">${emptyMessage}</p>`;
+                target.innerHTML = `<p class="font-bold text-stone-500">${emptyMessage}</p>`;
                 return;
             }
 
             target.innerHTML = `
-                <div class="item-stack">
+                <div class="flex flex-col gap-3">
                     ${items.map(item => `
-                        <div class="risk-item">
-                            <div class="risk-item-header">
+                        <div class="border-2 border-black p-3 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <strong>${escapeHtml(item.symbol || item.name || 'Unknown')}</strong>
-                                    <p style="font-size: 0.85rem;">${escapeHtml(item.name !== item.symbol && item.symbol ? item.name : item.category || item.relationship || '')}</p>
+                                    <strong class="font-['Epilogue'] text-lg">${escapeHtml(item.symbol || item.name || 'Unknown')}</strong>
+                                    <p class="text-sm text-stone-600 font-bold">${escapeHtml(item.name !== item.symbol && item.symbol ? item.name : item.category || item.relationship || '')}</p>
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                                    ${item.weight != null ? `<span class="tag">${Math.round(Number(item.weight) * 100)}% weight</span>` : ''}
-                                    ${item.confidence != null ? `<span class="tag">${Math.round(Number(item.confidence) * 100)}% confidence</span>` : ''}
+                                <div class="flex gap-2 items-center flex-wrap justify-end">
+                                    ${item.weight != null ? `<span class="border-2 border-black px-2 py-1 text-xs font-bold bg-[#bfdbfe] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">${Math.round(Number(item.weight) * 100)}% weight</span>` : ''}
+                                    ${item.confidence != null ? `<span class="border-2 border-black px-2 py-1 text-xs font-bold bg-[#bbf7d0] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">${Math.round(Number(item.confidence) * 100)}% confidence</span>` : ''}
                                 </div>
                             </div>
-                            <p style="font-size: 0.88rem;">${escapeHtml(item.reason || 'AI-estimated relationship for this ticker.')}</p>
+                            <p class="text-sm border-t-2 border-black border-dashed pt-2 mt-2">${escapeHtml(item.reason || 'AI-estimated relationship for this ticker.')}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -1014,21 +1016,21 @@
             if (!normalizedTicker) {
                 errorBanner.textContent = 'Enter a ticker before scanning.';
                 errorBanner.style.display = 'block';
-                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
-                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                suppliersList.innerHTML = '<p class="font-bold text-stone-500">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="font-bold text-stone-500">No peer companies found for this ticker yet.</p>';
                 return;
             }
 
             if (!isValidTicker) {
                 errorBanner.textContent = 'Ticker must use letters, numbers, dots, or hyphens only.';
                 errorBanner.style.display = 'block';
-                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
-                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                suppliersList.innerHTML = '<p class="font-bold text-stone-500">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="font-bold text-stone-500">No peer companies found for this ticker yet.</p>';
                 return;
             }
 
-            suppliersList.innerHTML = '<p class="empty-state">Loading supply-chain relationships...</p>';
-            competitorsList.innerHTML = '<p class="empty-state">Loading peer companies...</p>';
+            suppliersList.innerHTML = '<p class="font-bold text-stone-500">Loading supply-chain relationships...</p>';
+            competitorsList.innerHTML = '<p class="font-bold text-stone-500">Loading peer companies...</p>';
             summaryTicker.textContent = normalizedTicker || 'Ticker';
             summaryExplanation.textContent = 'Building an AI-estimated relationship map...';
             sourceBadge.textContent = 'Loading';
@@ -1079,8 +1081,8 @@
                     warningBanner.style.display = 'block';
                 }
             } catch (error) {
-                suppliersList.innerHTML = '<p class="empty-state">No supply-chain relationships found for this ticker yet.</p>';
-                competitorsList.innerHTML = '<p class="empty-state">No peer companies found for this ticker yet.</p>';
+                suppliersList.innerHTML = '<p class="font-bold text-stone-500">No supply-chain relationships found for this ticker yet.</p>';
+                competitorsList.innerHTML = '<p class="font-bold text-stone-500">No peer companies found for this ticker yet.</p>';
                 summaryExplanation.textContent = 'We could not load the relationship map for that ticker.';
                 sourceBadge.textContent = 'No data';
                 metaCopy.textContent = 'Try another ticker or check your Gemini API configuration.';
