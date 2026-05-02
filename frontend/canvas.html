@@ -339,6 +339,11 @@
         <div class="neobrutalist-card canvas-container" id="canvas-area">
             <svg class="connections" id="svg-layer"></svg>
 
+            <!-- Help text -->
+            <div id="canvas-hint" style="position: absolute; top: 1rem; right: 1.5rem; color: #94a3b8; font-family: 'Epilogue', sans-serif; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; pointer-events: none; z-index: 50; display: none;">
+                Click on a node to refine &amp; rebalance
+            </div>
+
             <!-- Empty state -->
             <div id="canvas-empty">
                 <img src="./cowIcons/ReachingGoalsCow.png"
@@ -470,8 +475,14 @@
             Object.keys(edgeLines).forEach(k => delete edgeLines[k]);
             Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
 
-            if (!nodesData.length) { emptyEl.style.display = 'flex'; return; }
+            const hintEl = document.getElementById('canvas-hint');
+            if (!nodesData.length) {
+                emptyEl.style.display = 'flex';
+                if (hintEl) hintEl.style.display = 'none';
+                return;
+            }
             emptyEl.style.display = 'none';
+            if (hintEl) hintEl.style.display = 'block';
 
             // Reset transform when new data comes in? (optional)
             // scale = 1; offsetX = 0; offsetY = 0; updateViewportTransform();
