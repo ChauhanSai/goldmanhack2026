@@ -2,9 +2,17 @@
 
 > **"Finance so easy a cow could do it."**
 
+### 🏆 First place submission to Goldman Sachs' AI Hackathon
+
+<!--![Landing Page](marketing/landing.png)-->
+
 Moore Money is a next-generation AI-powered wealth management and financial tracking platform built for the everyday retail investor. Designed with a unique **"Doodle Neobrutalist"** aesthetic to cut through corporate intimidation, Moore Money brings institutional-grade analytics, ecosystem risk mapping, and interactive scenario planning into an accessible, visually striking experience.
 
+[▶️ Watch our demo here on Moo-tube ↗](https://youtu.be/-SbBAWQm7zY)
+
 ---
+
+![Features](marketing/features.png)
 
 ## 🌟 Key Features
 
